@@ -1,0 +1,29 @@
+# Ambientes Virtuais
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Diretórios de Dataset (Imagens Brutas)
+data/
+
+# Pastas da IDE/Sistema
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+.gemini/
+
+# Modelos Gerados
+# O modelo treinado e o label encoder podem ser mantidos no repo se forem leves (como costumam ser em SVM),
+# mas caso excedam o limite do github (100mb), descomente a linha abaixo:
+# models/*.joblib
+
+# Logs e Artefatos do Agente
+logs/
+.agents/
