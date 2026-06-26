@@ -1,4 +1,4 @@
-# Relatório Técnico — Reconhecimento do Alfabeto Manual da Libras
+# Diário de Desenvolvimento — Reconhecimento do Alfabeto Manual da Libras
 **Trabalho Final da Disciplina de Visão Computacional**
 
 ## 1. Visão Geral do Projeto
@@ -35,6 +35,8 @@ Ao longo do desenvolvimento, enfrentamos severos desafios inerentes a problemas 
 ### Desafio 5: Interface Visual (HUD) Básica do OpenCV
 **O Problema:** As funções primitivas de desenho do OpenCV (`cv2.putText` e `cv2.rectangle`) são serrilhadas, não suportam renderização complexa e inviabilizam uma experiência de usuário moderna. O suporte à fonte padrão também quebrava a exibição de símbolos UTF-8 e Emojis, mostrando quadrados vazios.
 **A Solução:** Desenvolvemos uma classe customizada de renderização `UIRenderer` utilizando a biblioteca **Pillow (PIL)**. O frame OpenCV BGR é convertido dinamicamente para RGBA, processado pela PIL (suporte a fontes TrueType, cantos arredondados, Alpha Blending para painéis translúcidos e integração do `seguiemj.ttf` para Emojis Nativos em Cores), e devolvido para exibição. O resultado é um HUD de jogo fluido e altamente responsivo.
+
+---
 
 ### Desafio 6: Confusão em Sinais de Alta Complexidade e Dinâmicos (Em Aberto)
 **O Problema:** Durante os testes práticos recentes, identificamos limitações do modelo atual para casos específicos de oclusão e profundidade (eixo Z), além de falhas conceituais com letras dinâmicas:
