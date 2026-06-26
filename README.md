@@ -1,4 +1,4 @@
-# 🤟 Sistema Interativo de Reconhecimento do Alfabeto Manual da Libras
+# Sistema Interativo de Reconhecimento do Alfabeto Manual da Libras
 
 ## Descrição
 
