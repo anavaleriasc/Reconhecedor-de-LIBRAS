@@ -36,6 +36,14 @@ Ao longo do desenvolvimento, enfrentamos severos desafios inerentes a problemas 
 **O Problema:** As funções primitivas de desenho do OpenCV (`cv2.putText` e `cv2.rectangle`) são serrilhadas, não suportam renderização complexa e inviabilizam uma experiência de usuário moderna. O suporte à fonte padrão também quebrava a exibição de símbolos UTF-8 e Emojis, mostrando quadrados vazios.
 **A Solução:** Desenvolvemos uma classe customizada de renderização `UIRenderer` utilizando a biblioteca **Pillow (PIL)**. O frame OpenCV BGR é convertido dinamicamente para RGBA, processado pela PIL (suporte a fontes TrueType, cantos arredondados, Alpha Blending para painéis translúcidos e integração do `seguiemj.ttf` para Emojis Nativos em Cores), e devolvido para exibição. O resultado é um HUD de jogo fluido e altamente responsivo.
 
+### Desafio 6: Confusão em Sinais de Alta Complexidade e Dinâmicos (Em Aberto)
+**O Problema:** Durante os testes práticos recentes, identificamos limitações do modelo atual para casos específicos de oclusão e profundidade (eixo Z), além de falhas conceituais com letras dinâmicas:
+- **F vs T:** A diferença é minúscula (o indicador fica pela frente ou por trás do polegar). O MediaPipe frequentemente tem dificuldade de estimar a profundidade correta (Z) quando os dedos estão muito colados.
+- **N vs M vs Q:** M (três dedos para baixo), N (dois dedos para baixo) e Q (polegar e indicador para baixo). A métrica atual não diferencia perfeitamente a "quantidade" de dedos apontando para o chão.
+- **X:** O dedo indicador em formato de "gancho" confunde o cálculo de "esticado vs dobrado", já que ele fica no meio termo.
+- **I vs J / Z:** J e Z são letras **dinâmicas** que dependem de movimento ao longo do tempo. Analisá-las em um frame estático faz o J ser confundido com o I (mesma pose inicial) e o Z ser confundido com D ou 1.
+**Próximos Passos:** Formular e testar novas métricas geométricas focadas na posição relativa do polegar, adicionar rastreamento temporal (buffer de frames) para detectar movimento, e refinar a métrica de "gancho".
+
 ---
 
 ## 3. Conclusão Parcial
