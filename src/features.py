@@ -130,6 +130,54 @@ def extract_features_from_landmarks(landmarks):
             proj = 0.0
         cruzamento.append(proj)
 
+    # h) Diferença Explícita Polegar vs Indicador (F vs T)
+    # T e F diferem muito em profundidade (Z) e sobreposição.
+    diff_thumb_index = landmarks[8] - landmarks[4]
+
+    # i) Vetores Apontados para Baixo (M vs N vs Q)
+    # Avalia o componente Y (que aponta para baixo na câmera) do vetor do dedo.
+    # Isso diferencia 3 dedos caídos (M) de 2 dedos caídos (N).
+    down_vectors = []
+    for tip_idx, mcp_idx in zip([8, 12, 16], [5, 9, 13]):
+        vec = landmarks[tip_idx] - landmarks[mcp_idx]
+        down_vectors.append(vec[1])  # Y componente
+
+    # j) Métrica de Gancho do Indicador (X)
+    # Mede o grau de curvatura do indicador. Se reto = ~1.0, se gancho (X) < 0.8
+    hook_index_dist_straight = np.linalg.norm(landmarks[8] - landmarks[6]) + np.linalg.norm(landmarks[6] - landmarks[5])
+    hook_index = [np.linalg.norm(landmarks[8] - landmarks[5]) / (hook_index_dist_straight + 1e-6)]
+
+    # k) Bússola Interna da Mão (Independência de Rotação da Câmera)
+    # Em vez de confiar no eixo Y da câmera, criamos um vetor "Bússola"
+    # que aponta do punho (0) para a base do dedo médio (9).
+    v_compass = landmarks[9] - landmarks[0]
+    norm_compass = np.linalg.norm(v_compass)
+    if norm_compass > 0:
+        v_compass_norm = v_compass / norm_compass
+    else:
+        v_compass_norm = np.array([0, 1, 0])
+        
+    compass_fingers = []
+    # Para cada dedo principal (indicador, médio, anelar, mínimo), 
+    # medimos a similaridade do vetor (MCP -> TIP) com a Bússola.
+    for tip_idx, mcp_idx in zip([8, 12, 16, 20], [5, 9, 13, 17]):
+        vec = landmarks[tip_idx] - landmarks[mcp_idx]
+        norm_vec = np.linalg.norm(vec)
+        if norm_vec > 0:
+            vec_norm = vec / norm_vec
+            compass_fingers.append(np.dot(v_compass_norm, vec_norm))
+        else:
+            compass_fingers.append(0.0)
+            
+    # Bússola cruzada com o Polegar (Crucial para separar Q de N)
+    v_thumb = landmarks[4] - landmarks[2]
+    norm_thumb = np.linalg.norm(v_thumb)
+    if norm_thumb > 0:
+        v_thumb_norm = v_thumb / norm_thumb
+        compass_thumb = [np.dot(v_compass_norm, v_thumb_norm)]
+    else:
+        compass_thumb = [0.0]
+
     features = np.concatenate([
         coords_flattened,      # 63
         dist_to_wrist,         # 5
@@ -137,7 +185,12 @@ def extract_features_from_landmarks(landmarks):
         angulos,               # 4
         dist_thumb_others,     # 4
         dobramento,            # 4
-        cruzamento             # 4
-    ])  # Total = 88 features
+        cruzamento,            # 4
+        diff_thumb_index,      # 3
+        down_vectors,          # 3
+        hook_index,            # 1
+        compass_fingers,       # 4
+        compass_thumb          # 1
+    ])  # Total = 100 features
 
     return features.astype(np.float32)
