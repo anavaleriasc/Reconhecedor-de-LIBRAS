@@ -75,8 +75,10 @@ libras-alphabet-cv/
     ├── train.py                      # Treinamento do classificador
     ├── evaluate.py                   # Avaliação do modelo
     ├── predict_image.py              # Predição de imagem isolada
-    └── webcam_app.py              # Modo interativo com webcam (jogo)
+    └── webcam_app.py              # Modo interativo com webcam (jogo e análise)
 ```
+
+> **Nota Importante:** As pastas `models/` e `results/` deste repositório já vêm acompanhadas de um **modelo previamente treinado** (junto com os relatórios e gráficos técnicos gerados durante o seu treinamento) e também contêm **resultados e evidências de experimentos** reais feitos através do Modo de Análise. Dessa forma, você pode iniciar testes com a câmera imediatamente, sem a necessidade de baixar o dataset para treinar o classificador do zero.
 
 ## Dependências
 
@@ -268,6 +270,26 @@ Você pode utilizar os seguintes controles no teclado para gerar dados reais de 
     "temporal_stability": 0.75
 }
 ```
+
+### Comandos de Relatório e Gráficos
+
+Para facilitar a documentação científica do seu TCC, criamos 4 scripts que processam os dados gerados pelo Modo Análise:
+
+1. **Gráficos da Sessão (Linhas e Barras)**
+   Gera imagens (`.png`) da linha do tempo e distribuição das classes para cada arquivo CSV gravado.
+   ```bash
+   python -m src.plot_logs
+   ```
+2. **Consolidação de Sessões**
+   Varre todos os JSONs de resumo e agrupa as métricas (duração, trocas de classe, etc.) numa tabela única (`session_summary.csv`).
+   ```bash
+   python -m src.aggregate_sessions
+   ```
+3. **Calcanhar de Aquiles (Piores Classes)**
+   Lê o arquivo `classification_report.csv` (gerado após avaliar o modelo) e desenha um gráfico ranqueando as 10 letras com menor F1-Score.
+   ```bash
+   python -m src.plot_worst_classes
+   ```
 
 ### Exemplo de resultado final (Modo Jogo)
 

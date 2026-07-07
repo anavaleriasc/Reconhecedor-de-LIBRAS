@@ -18,6 +18,10 @@ Uso:
 import argparse
 import os
 import sys
+import warnings
+
+# Suprimir os alertas chatos de depreciação do Protobuf causados pelo MediaPipe
+warnings.filterwarnings("ignore", category=UserWarning, module="google.protobuf.symbol_database")
 import time
 import cv2
 import numpy as np
@@ -537,14 +541,37 @@ def main():
         # Executar modo de análise avançado
         try:
             from src.analysis_mode import run_analysis_mode
+            from datetime import datetime
         except ImportError as e:
             print(f"Erro ao carregar o módulo de análise: {e}")
             sys.exit(1)
+            
+        print("\n" + "-"*50)
+        print("  METADADOS DA SESSÃO DE ANÁLISE")
+        print("-" * 50)
+        
+        default_name = f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        session_name = input(f"Nome da sessão (padrão: {default_name}): ").strip()
+        if not session_name:
+            session_name = default_name
+            
+        condition = input("Condição (ex: boa_iluminacao) (padrão: unspecified): ").strip()
+        if not condition:
+            condition = "unspecified"
+            
+        notes = input("Notas: ").strip()
+        
+        metadata = {
+            "session_name": session_name,
+            "condition": condition,
+            "notes": notes
+        }
             
         run_analysis_mode(
             modelo=modelo,
             label_encoder=label_encoder,
             camera_index=args.camera,
+            metadata=metadata
         )
 
 

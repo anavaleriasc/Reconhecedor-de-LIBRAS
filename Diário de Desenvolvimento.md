@@ -70,5 +70,14 @@ Ao longo do desenvolvimento, enfrentamos severos desafios inerentes a problemas 
 
 ---
 
+### Desafio 9: Automação em Lote e Consistência da Vida Real vs Modelo
+**O Problema:** Conforme o escopo da documentação do TCC cresceu, rodar análises estatísticas manualmente sessão por sessão e lidar com arquivos soltos se tornou um pesadelo logístico. Além disso, identificamos que a "Mão Direita" do usuário estava sendo salva como "Mão Esquerda" no arquivo CSV final devido ao efeito "espelho" exigido pela câmera para manter a navegação intuitiva.
+**A Solução:**
+1. **Pipeline de Geração de Gráficos:** Criamos três scripts modulares de automação (`plot_logs.py`, `aggregate_sessions.py` e `plot_worst_classes.py`). Com um simples comando, o Python agora varre uma centena de sessões ao mesmo tempo, constrói os gráficos temporais (`_plot.png`), gráficos de frequência (`_class_frequency.png`) e agrupa todas as métricas em uma planilha mestre de excel (`session_summary.csv`), eliminando o trabalho braçal do pesquisador.
+2. **Fluxo de Câmera Contínuo:** Inserimos nativamente a biblioteca `tkinter` "por cima" do loop do OpenCV, permitindo que a "Tecla N" invoque um pop-up elegante perguntando o nome da nova sessão, sem necessidade de minimizar a câmera ou ir para o terminal, acelerando exponencialmente a coleta de múltiplos cenários pelo testador.
+3. **Consistência de "Handedness":** Implementamos uma trava cosmética final de log. Como o MediaPipe processa a câmera *já* espelhada (e portanto identifica a direita física como esquerda de fato), o nosso algoritmo de `normalize_landmarks` desfaz o erro matematicamente virando o eixo X. Contudo, o arquivo CSV ficava textualmente incorreto. Interceptamos a flag de Handedness antes dela tocar no arquivo CSV e fizemos a re-inversão (`if display_handedness == 'Left': return 'Right'`), garantindo que o log refletisse perfeitamente o membro físico utilizado na vida real.
+
+---
+
 ## 3. Conclusão Parcial
-Até o momento, o núcleo de Visão Computacional, extração de características (Feature Engineering) e o pipeline de aprendizado de máquina (SVM + Scikit-Learn) estão finalizados e extremamente robustos. O fluxo principal de jogabilidade interativa também está operacional. O projeto está preparado para a apresentação final da disciplina.
+Até o momento, o núcleo de Visão Computacional, extração de características (Feature Engineering) e o pipeline de aprendizado de máquina (SVM + Scikit-Learn) estão finalizados e extremamente robustos. O fluxo principal de jogabilidade interativa e a central de análise científica em lote também estão operacionais.

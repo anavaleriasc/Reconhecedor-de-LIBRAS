@@ -1,0 +1,14 @@
+{
+    "capture_type": "automatic",
+    "elapsed_seconds": 6.09,
+    "hand_detected": true,
+    "handedness": "Left",
+    "top1": "Q",
+    "prob_top1": 0.9108,
+    "top2": "N",
+    "prob_top2": 0.0095,
+    "top3": "M",
+    "prob_top3": 0.0079,
+    "margin_top1_top2": 0.9012,
+    "smoothed_prediction": "Q"
+}

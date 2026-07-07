@@ -13,8 +13,9 @@ from src.utils import garantir_diretorio
 from src.ui import UIRenderer
 
 class AnalysisSession:
-    def __init__(self, output_dir="results/analysis"):
+    def __init__(self, metadata, output_dir="results/analysis"):
         self.output_dir = output_dir
+        self.metadata = metadata
         self.is_recording = False
         self.start_time = None
         self.session_data = []
@@ -23,14 +24,28 @@ class AnalysisSession:
         self.last_pred_instant = None
         self.class_switches = 0
         
+        import re
+        raw_name = self.metadata.get("session_name", "").strip()
+        if not raw_name:
+            raw_name = f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        self.session_id = re.sub(r'[^a-zA-Z0-9_\-]', '_', raw_name)
+        
+        # Novas propriedades exigidas
+        self.session_duration_target = 10.0
+        self.auto_capture_times = [2.0, 4.0, 6.0, 8.0, 10.0]
+        self.auto_captures_saved = 0
+        self.completed_full_duration = False
+        self.interruption_reason = ""
+        
         # Preparar diretórios
         garantir_diretorio(os.path.join(self.output_dir, "logs"))
         garantir_diretorio(os.path.join(self.output_dir, "summaries"))
-        garantir_diretorio(os.path.join(self.output_dir, "frames"))
+        self.frames_dir = os.path.join(self.output_dir, "frames", self.session_id)
+        garantir_diretorio(self.frames_dir)
 
     def toggle_recording(self):
         if self.is_recording:
-            self.stop_recording()
+            self.stop_recording(manual=True)
         else:
             self.start_recording()
 
@@ -42,20 +57,47 @@ class AnalysisSession:
         self.last_pred_instant = None
         self.class_switches = 0
         self.temporal_window.clear()
-        print("\n[INFO] Gravação de sessão iniciada.")
+        
+        self.auto_captures_saved = 0
+        self.completed_full_duration = False
+        self.interruption_reason = ""
+        print("\n[INFO] Gravação de sessão iniciada (Duração Alvo: 10s).")
 
-    def stop_recording(self):
+    def stop_recording(self, manual=False):
         if not self.is_recording:
             return
         self.is_recording = False
         duration = time.time() - self.start_time
-        print(f"\n[INFO] Gravação encerrada. Duração: {duration:.2f}s")
+        
+        if manual:
+            self.completed_full_duration = False
+            self.interruption_reason = "manual_stop"
+            print(f"\n[INFO] Gravação INTERROMPIDA manualmente. Duração: {duration:.2f}s")
+        else:
+            self.completed_full_duration = True
+            print(f"\n[INFO] Gravação concluída com sucesso (10s).")
+            
         if len(self.session_data) > 0:
             self.save_session(duration)
         else:
             print("[AVISO] Sessão encerrada sem nenhum frame processado.")
 
-    def record_frame(self, hand_detected, handedness, top3_list, fps):
+    def get_elapsed_time(self):
+        if not self.is_recording or self.start_time is None:
+            return 0.0
+        return time.time() - self.start_time
+
+    def should_auto_stop(self):
+        return self.is_recording and self.get_elapsed_time() >= self.session_duration_target
+
+    def should_capture_automatically(self, elapsed_seconds):
+        if self.auto_captures_saved < len(self.auto_capture_times):
+            target = self.auto_capture_times[self.auto_captures_saved]
+            if elapsed_seconds >= target:
+                return True
+        return False
+
+    def record_frame(self, elapsed_seconds, hand_detected, handedness, top3_list, fps):
         self.frame_count += 1
         
         # Votação temporal
@@ -94,6 +136,7 @@ class AnalysisSession:
 
         row = {
             "timestamp": now_str,
+            "elapsed_seconds": f"{elapsed_seconds:.2f}",
             "frame": self.frame_count,
             "hand_detected": hand_detected,
             "handedness": handedness if handedness else "",
@@ -112,10 +155,8 @@ class AnalysisSession:
         return smoothed_prediction
 
     def save_session(self, duration):
-        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
         # Salvar CSV
-        csv_path = os.path.join(self.output_dir, "logs", f"analysis_{timestamp_str}.csv")
+        csv_path = os.path.join(self.output_dir, "logs", f"{self.session_id}.csv")
         try:
             with open(csv_path, mode='w', newline='', encoding='utf-8') as f:
                 if not self.session_data:
@@ -147,7 +188,12 @@ class AnalysisSession:
         margem_media = sum(margins) / len(margins) if margins else 0
         
         summary = {
+            "session_name": self.metadata.get("session_name", self.session_id),
+            "condition": self.metadata.get("condition", "unspecified"),
+            "notes": self.metadata.get("notes", ""),
             "duration_seconds": round(duration, 2),
+            "session_duration_target": self.session_duration_target,
+            "completed_full_duration": self.completed_full_duration,
             "total_frames": self.frame_count,
             "valid_frames": num_valid_frames,
             "hand_detection_rate": round(num_valid_frames / self.frame_count if self.frame_count > 0 else 0, 4),
@@ -156,11 +202,17 @@ class AnalysisSession:
             "average_top1_confidence": round(confianca_media, 4),
             "average_margin": round(margem_media, 4),
             "class_switches": self.class_switches,
-            "temporal_stability": round(estabilidade, 4)
+            "temporal_stability": round(estabilidade, 4),
+            "auto_captures_target": len(self.auto_capture_times),
+            "auto_capture_times_seconds": self.auto_capture_times,
+            "auto_captures_saved": self.auto_captures_saved
         }
         
+        if not self.completed_full_duration:
+            summary["interruption_reason"] = self.interruption_reason
+            
         # Salvar JSON
-        json_path = os.path.join(self.output_dir, "summaries", f"analysis_{timestamp_str}.json")
+        json_path = os.path.join(self.output_dir, "summaries", f"{self.session_id}.json")
         try:
             with open(json_path, mode='w', encoding='utf-8') as f:
                 json.dump(summary, f, indent=4)
@@ -173,16 +225,22 @@ class AnalysisSession:
             print(f"{k}: {v}")
         print("------------------------\n")
 
-    def save_problematic_frame(self, frame_bgr, hand_detected, handedness, top3_list, smoothed):
+    def save_capture_frame(self, capture_type, frame_raw, frame_landmarks, elapsed_seconds, hand_detected, handedness, top3_list, smoothed):
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        img_path = os.path.join(self.output_dir, "frames", f"frame_{timestamp_str}.png")
-        json_path = os.path.join(self.output_dir, "frames", f"frame_{timestamp_str}.json")
+        prefix = "auto" if capture_type == "automatic" else "manual"
+        t_str = f"_t{int(elapsed_seconds):02d}" if capture_type == "automatic" else f"_{timestamp_str}"
+        
+        base_name = f"{prefix}_{self.session_id}{t_str}"
+        img_orig_path = os.path.join(self.frames_dir, f"{base_name}_original.png")
+        img_land_path = os.path.join(self.frames_dir, f"{base_name}_landmarks.png")
+        json_path = os.path.join(self.frames_dir, f"{base_name}.json")
         
         try:
-            cv2.imwrite(img_path, frame_bgr)
+            cv2.imwrite(img_orig_path, frame_raw)
+            cv2.imwrite(img_land_path, frame_landmarks)
         except Exception as e:
-            print(f"[ERRO] Falha ao salvar imagem do frame problemático: {e}")
+            print(f"[ERRO] Falha ao salvar imagens da captura: {e}")
             return
             
         top1, prob1, top2, prob2, top3, prob3 = "", "", "", "", "", ""
@@ -197,7 +255,8 @@ class AnalysisSession:
             top3, prob3 = top3_list[2]
             
         data = {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "capture_type": capture_type,
+            "elapsed_seconds": round(elapsed_seconds, 2) if elapsed_seconds > 0 else 0.0,
             "hand_detected": hand_detected,
             "handedness": handedness,
             "top1": top1,
@@ -213,12 +272,18 @@ class AnalysisSession:
         try:
             with open(json_path, mode='w', encoding='utf-8') as f:
                 json.dump(data, f, indent=4)
-            print(f"[INFO] Frame problemático salvo com sucesso: {timestamp_str}")
+            if capture_type == "manual":
+                print(f"[INFO] Captura manual salva com sucesso: {base_name}")
+            else:
+                print(f"[INFO] Captura automática salva ({elapsed_seconds:.1f}s)")
         except Exception as e:
-            print(f"[ERRO] Falha ao salvar JSON do frame problemático: {e}")
+            print(f"[ERRO] Falha ao salvar JSON da captura: {e}")
 
-def run_analysis_mode(modelo, label_encoder, camera_index: int):
+def run_analysis_mode(modelo, label_encoder, camera_index: int, metadata: dict = None):
     """Executa o modo de análise avançado."""
+    if metadata is None:
+        metadata = {}
+        
     try:
         from src.landmarks import extract_hand_landmarks
         from src.features import normalize_landmarks, extract_features_from_landmarks
@@ -234,23 +299,25 @@ def run_analysis_mode(modelo, label_encoder, camera_index: int):
 
     print("\nControles do Modo de Análise:")
     print("  S - Iniciar/Parar Gravação da Sessão (CSV + JSON)")
-    print("  F - Salvar Frame Problemático atual (Imagem + JSON)")
+    print("  F - Salvar Captura Manual atual (Original + Landmarks + JSON)")
     print("  Q - Sair")
     print("-" * 50)
     
     classes = label_encoder.classes_
-    session = AnalysisSession(output_dir=os.path.join(config.RESULTS_DIR, "analysis"))
+    session_counter = 1
+    session = AnalysisSession(metadata=metadata, output_dir=os.path.join(config.RESULTS_DIR, "analysis"))
     
     # Controle de FPS
     prev_frame_time = time.time()
     
     try:
         while True:
-            ret, frame_raw = cap.read()
-            if not ret or frame_raw is None:
+            ret, frame_raw_camera = cap.read()
+            if not ret or frame_raw_camera is None:
                 continue
 
-            frame = cv2.flip(frame_raw, 1)
+            frame = cv2.flip(frame_raw_camera, 1)
+            frame_raw = frame.copy() # Cópia sem desenhos para salvar no original
             
             # Calcular FPS
             new_frame_time = time.time()
@@ -276,9 +343,13 @@ def run_analysis_mode(modelo, label_encoder, camera_index: int):
                     feature_vector_2d = feature_vector.reshape(1, -1)
                     if hasattr(modelo, "predict_proba"):
                         probs = modelo.predict_proba(feature_vector_2d)[0]
+                        # Garantir mapeamento exato com modelo.classes_
+                        encoded_classes = modelo.classes_
                         top_indices = np.argsort(probs)[::-1][:3]
                         for idx in top_indices:
-                            top3.append((classes[idx], probs[idx]))
+                            encoded_label = encoded_classes[idx]
+                            letra = label_encoder.inverse_transform([encoded_label])[0]
+                            top3.append((letra, float(probs[idx])))
                     else:
                         predicao = modelo.predict(feature_vector_2d)[0]
                         letra = label_encoder.inverse_transform([predicao])[0]
@@ -286,8 +357,25 @@ def run_analysis_mode(modelo, label_encoder, camera_index: int):
                 except Exception:
                     pass
             
+            # Checar parada automática
+            if session.should_auto_stop():
+                session.stop_recording(manual=False)
+                
+            elapsed = session.get_elapsed_time()
+            
+            # Como a câmera é espelhada (cv2.flip), o MediaPipe inverte as mãos (Direita vira Esquerda).
+            # Para o log, nós invertemos de volta para refletir a mão física real do usuário.
+            display_handedness = None
+            if handedness_label:
+                display_handedness = "Right" if handedness_label == "Left" else "Left"
+            
             # Registrar frame e obter predição suavizada
-            smoothed_pred = session.record_frame(hand_detected, handedness_label, top3, fps)
+            smoothed_pred = session.record_frame(elapsed, hand_detected, display_handedness, top3, fps)
+            
+            # Checar captura automática
+            if session.is_recording and session.should_capture_automatically(elapsed):
+                session.save_capture_frame("automatic", frame_raw, debug_image, elapsed, hand_detected, display_handedness, top3, smoothed_pred)
+                session.auto_captures_saved += 1
             
             # =========================================================
             # Renderizar HUD Avançado
@@ -302,10 +390,9 @@ def run_analysis_mode(modelo, label_encoder, camera_index: int):
             
             # Indicador de gravação
             if session.is_recording:
-                # Piscar bolinha vermelha
                 if int(time.time() * 2) % 2 == 0:
                     ui.draw.ellipse((22, 22, 38, 38), fill=(255, 0, 0, 255))
-                ui.draw_text("GRAVANDO SESSÃO...", (45, 35), (0, 0, 255), size=14, bold=True)
+                ui.draw_text(f"GRAVANDO: {elapsed:.1f}s / {session.session_duration_target}s", (45, 35), (0, 0, 255), size=14, bold=True)
             else:
                 ui.draw_text("MODO ANÁLISE", (30, 35), (255, 255, 255), size=14, bold=True)
                 
@@ -341,7 +428,7 @@ def run_analysis_mode(modelo, label_encoder, camera_index: int):
                 ui.draw_text("Mão não detectada", (20, y_offset), (0, 0, 255), size=16)
 
             # Legenda de teclas no rodapé
-            ui.draw_text("S: Gravar | F: Salvar Frame | Q: Sair", (10, altura - 25), (200, 200, 200), size=14)
+            ui.draw_text("S: Gravar | N: Nova Sessão | F: Captura | Q: Sair", (10, altura - 25), (200, 200, 200), size=14)
                 
             frame_final = ui.render()
             cv2.imshow(config.WEBCAM_WINDOW_NAME, frame_final)
@@ -349,15 +436,33 @@ def run_analysis_mode(modelo, label_encoder, camera_index: int):
             tecla = cv2.waitKey(config.WEBCAM_FPS_DELAY) & 0xFF
             
             if tecla == ord("q") or tecla == ord("Q"):
-                session.stop_recording()
+                session.stop_recording(manual=True)
                 break
             elif tecla == ord("s") or tecla == ord("S"):
                 session.toggle_recording()
+            elif tecla == ord("n") or tecla == ord("N"):
+                if session.is_recording:
+                    session.stop_recording(manual=True)
+                
+                import tkinter as tk
+                from tkinter import simpledialog
+                root = tk.Tk()
+                root.attributes("-topmost", True)
+                root.withdraw()
+                novo_nome = simpledialog.askstring("Nova Sessão", "Digite o nome da nova sessão:", parent=root)
+                root.destroy()
+                
+                if novo_nome and novo_nome.strip():
+                    new_metadata = metadata.copy()
+                    new_metadata["session_name"] = novo_nome.strip()
+                    metadata = new_metadata  # Atualiza para manter como base
+                    session = AnalysisSession(metadata=new_metadata, output_dir=os.path.join(config.RESULTS_DIR, "analysis"))
+                    print(f"\n[INFO] Nova sessão carregada e pronta: {session.session_id}")
             elif tecla == ord("f") or tecla == ord("F"):
-                session.save_problematic_frame(debug_image, hand_detected, handedness_label, top3, smoothed_pred)
+                session.save_capture_frame("manual", frame_raw, debug_image, elapsed, hand_detected, handedness_label, top3, smoothed_pred)
                 
     except KeyboardInterrupt:
-        session.stop_recording()
+        session.stop_recording(manual=True)
     finally:
         cap.release()
         cv2.destroyAllWindows()

@@ -1,0 +1,31 @@
+{
+    "session_name": "letra_S",
+    "condition": "unspecified",
+    "notes": "",
+    "duration_seconds": 10.08,
+    "session_duration_target": 10.0,
+    "completed_full_duration": true,
+    "total_frames": 90,
+    "valid_frames": 90,
+    "hand_detection_rate": 1.0,
+    "most_frequent_top1": "S",
+    "top3_frequent_classes": [
+        [
+            "S",
+            90
+        ]
+    ],
+    "average_top1_confidence": 0.8305,
+    "average_margin": 0.7518,
+    "class_switches": 0,
+    "temporal_stability": 1.0,
+    "auto_captures_target": 5,
+    "auto_capture_times_seconds": [
+        2.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0
+    ],
+    "auto_captures_saved": 4
+}
