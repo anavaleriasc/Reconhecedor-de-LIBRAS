@@ -1,4 +1,4 @@
-# 🤟 Sistema Interativo de Reconhecimento do Alfabeto Manual da Libras
+# Sistema Interativo de Reconhecimento do Alfabeto Manual da Libras
 
 ## Descrição
 
@@ -49,9 +49,24 @@ Letra prevista
 ## Estrutura do Projeto
 
 ```
-libras-alphabet-cv/
-├── README.md                         # Este arquivo
+reconhecedor-de-LIBRAS/
+├── README.md                         
 ├── requirements.txt                  # Dependências do projeto
+│
+├── api/                              
+│   ├── game.py                       # Gerenciamento de sessões
+│   ├── main.py                       # Ponto de entrada da API
+│   │
+│   ├── routes/                      
+│   │   ├── game.py                  
+│   │   └── prediction.py             
+│   ├── schemas/                      
+│   │   ├── game.py                   
+│   │   └── prediction.py            
+│   └── services/                    
+│       ├── game_service.py         
+│       └── prediction_service.py    
+│
 ├── data/
 │   ├── raw/                          # Dataset organizado por letra
 │   │   ├── A/                        # Imagens da letra A
@@ -60,22 +75,27 @@ libras-alphabet-cv/
 │   │   └── Z/                        # Imagens da letra Z
 │   ├── processed/                    # Dados processados (features extraídas)
 │   └── samples/                      # Imagens de exemplo para teste
+│ 
 ├── models/
 │   ├── classifier.joblib             # Modelo treinado
 │   └── label_encoder.joblib          # Codificador de rótulos
+│ 
 ├── results/
 │   └── figures/                      # Gráficos, matrizes de confusão, etc.
+│ 
 └── src/
     ├── __init__.py                   # Inicialização do pacote
     ├── config.py                     # Configurações globais do projeto
-    ├── landmarks.py                  # Detecção e extração de landmarks via MediaPipe
-    ├── features.py                   # Normalização e descritores geométricos
     ├── dataset.py                    # Carregamento do dataset
-    ├── utils.py                      # Funções utilitárias
-    ├── train.py                      # Treinamento do classificador
     ├── evaluate.py                   # Avaliação do modelo
+    ├── features.py                   # Normalização e descritores geométricos
+    ├── landmarks.py                  # Detecção e extração de landmarks via MediaPipe
     ├── predict_image.py              # Predição de imagem isolada
-    └── realtime_game.py              # Modo interativo com webcam (jogo)
+    ├── prediction.py                 # Módulo a ser usado pela API
+    ├── realtime_game.py              # Modo interativo com webcam (jogo)
+    ├── train.py                      # Treinamento do classificador
+    ├── ui.py                         # Renderização do OpenCV
+    └── utils.py                      # Funções utilitárias
 ```
 
 ## Dependências
@@ -95,8 +115,8 @@ libras-alphabet-cv/
 
 ```bash
 # 1. Clonar o repositório
-git clone https://github.com/seu-usuario/libras-alphabet-cv.git
-cd libras-alphabet-cv
+git clone https://github.com/seu-usuario/reconhecedor-de-LIBRAS.git
+cd reconhecedor-de-LIBRAS
 
 # 2. (Recomendado) Criar um ambiente virtual
 python -m venv .venv
@@ -249,6 +269,13 @@ Pontuação final: 75 / 100
 ========================================
 ```
 
+## Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 ## Pipeline de Processamento (Landmarks)
 
 ```text
@@ -280,10 +307,10 @@ Pontuação final: 75 / 100
 
 ## Melhorias Futuras
 
-- 🎬 **Reconhecimento de letras dinâmicas**: Implementar análise temporal de landmarks (ex: LSTM ou GRU em cima dos vetores do MediaPipe) para reconhecer as letras J e Z.
-- 📊 **Interface gráfica**: Criar uma interface gráfica completa (Tkinter, PyQt ou web) para facilitar o uso por pessoas não técnicas.
-- 🗃️ **Banco de dados de progresso**: Armazenar o histórico de sessões do usuário para acompanhar a evolução do aprendizado ao longo do tempo.
-- 🔤 **Palavras e frases**: Expandir o modo interativo para incluir um dicionário de palavras em Libras com significados e exemplos.
+- **Reconhecimento de letras dinâmicas**: Implementar análise temporal de landmarks (ex: LSTM ou GRU em cima dos vetores do MediaPipe) para reconhecer as letras J e Z.
+- **Interface gráfica**: Criar uma interface gráfica completa (Tkinter, PyQt ou web) para facilitar o uso por pessoas não técnicas.
+- **Banco de dados de progresso**: Armazenar o histórico de sessões do usuário para acompanhar a evolução do aprendizado ao longo do tempo.
+- **Palavras e frases**: Expandir o modo interativo para incluir um dicionário de palavras em Libras com significados e exemplos.
 
 ## Licença
 
