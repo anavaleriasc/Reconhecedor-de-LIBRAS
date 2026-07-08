@@ -49,11 +49,6 @@ export default function Home() {
             Escolha o modo de jogo
           </h1>
 
-          <p className="home-subtitle">
-            Selecione uma modalidade para iniciar o reconhecimento da
-            soletração manual.
-          </p>
-
           {!modo ? (
             <div className="game-mode-grid">
               <button
