@@ -26,9 +26,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # Create React App
-        "http://localhost:5173",  # Vite
-        "https://reconhecedor-de-libras-8nulq8lso-bdrg-2.vercel.app/",  
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://reconhecedor-de-libras.vercel.app/",
     ],
     allow_credentials=True,
     allow_methods=["*"],
