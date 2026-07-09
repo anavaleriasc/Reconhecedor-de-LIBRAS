@@ -8,6 +8,8 @@ o **MediaPipe Hands** para detecção precisa e extração de landmarks (21 pont
 e em seguida calcula descritores geométricos que são alimentados em classificadores
 clássicos de aprendizado de máquina.
 
+**[Assista a demonstração de uso](https://youtu.be/tmEsHRk0ohA)**
+
 ## Justificativa Técnica
 
 Inicialmente, este projeto testou abordagens de segmentação baseadas em cor de pele e
