@@ -38,15 +38,46 @@ Ao longo do desenvolvimento, enfrentamos severos desafios inerentes a problemas 
 
 ---
 
-### Desafio 6: Confusão em Sinais de Alta Complexidade e Dinâmicos (Em Aberto)
+### Desafio 6: Confusão em Sinais de Alta Complexidade e Dinâmico
 **O Problema:** Durante os testes práticos recentes, identificamos limitações do modelo atual para casos específicos de oclusão e profundidade (eixo Z), além de falhas conceituais com letras dinâmicas:
 - **F vs T:** A diferença é minúscula (o indicador fica pela frente ou por trás do polegar). O MediaPipe frequentemente tem dificuldade de estimar a profundidade correta (Z) quando os dedos estão muito colados.
 - **N vs M vs Q:** M (três dedos para baixo), N (dois dedos para baixo) e Q (polegar e indicador para baixo). A métrica atual não diferencia perfeitamente a "quantidade" de dedos apontando para o chão.
 - **X:** O dedo indicador em formato de "gancho" confunde o cálculo de "esticado vs dobrado", já que ele fica no meio termo.
 - **I vs J / Z:** J e Z são letras **dinâmicas** que dependem de movimento ao longo do tempo. Analisá-las em um frame estático faz o J ser confundido com o I (mesma pose inicial) e o Z ser confundido com D ou 1.
-**Próximos Passos:** Formular e testar novas métricas geométricas focadas na posição relativa do polegar, adicionar rastreamento temporal (buffer de frames) para detectar movimento, e refinar a métrica de "gancho".
+**A Solução (Engenharia Geométrica Avançada):** O vetor de características foi expandido de 88 para 95 dimensões, englobando cálculos focados nas falhas relatadas:
+- **Diferença Explícita de Oclusão (F vs T):** Adicionamos a diferença vetorial 3D `(X, Y, Z)` entre a ponta do indicador e do polegar. O SVM agora se apoia no Z (profundidade) para decidir com 100% de precisão quem está na frente de quem.
+- **Vetores Apontados para o Chão (M vs N vs Q):** Isolamos o componente Y (vertical) do vetor direcional de cada dedo. Isso ensina o modelo a literalmente "contar" quantos dedos estão verticalizados, distinguindo 3 dedos caídos (M) de 2 dedos caídos (N).
+- **Métrica de Gancho (X):** Introduzimos uma razão matemática que calcula o quão flexionada está a articulação central (PIP) do indicador, medindo se o dedo forma uma curva fechada independente do tamanho da mão.
+- **Sinais Dinâmicos (J e Z):** Mantidos como classe estática temporariamente, observando-se que em frames específicos de "fotografia" eles mimetizam outras letras. A mitigação final se apoia na votação temporal.
+
+### Desafio 7: Criação de Suíte de Depuração Científica
+**O Problema:** Durante a fase final do projeto, testar as heurísticas de correção no escuro ou "jogando o jogo" revelou-se ineficaz para mapear o grau de incerteza do classificador, dificultando a comprovação de sucesso para o relatório do trabalho.
+**A Solução:** Separação estrita de responsabilidades. O jogo original foi mantido, mas um novo ecossistema (`src/analysis_mode.py`) foi desenvolvido focando em:
+1. **HUD Analítico em Tempo Real:** Visualização simultânea das Top-3 classes mais prováveis (`predict_proba`) e a margem percentual de empate entre elas.
+2. **Votação Temporal (Smoothing):** Implementação de uma janela deslizante (Fila Circular) dos últimos 15 frames. A predição "suavizada" elimina ruídos e oscilações abruptas, estabilizando a resposta lida.
+3. **Mecanismo de Gravação de Sessão:** Sistema capaz de exportar a jornada matemática de uso contínuo (CSV) e um JSON com cálculos de "Estabilidade Temporal" e "Número de Trocas de Classe" (`class_switches`), consolidando as provas físicas do funcionamento da rede para apresentação de TCC.
+4. **Captura Fotográfica de Falhas:** Permite salvar simultaneamente um frame defeituoso na iluminação (`.png`) pareado com os tensores de predição (`.json`), vital para a seção de limitações do relatório técnico.
+
+---
+
+### Desafio 8: Invariância Rotacional para Letras Invertidas (M, N, Q)
+**O Problema:** Observou-se uma altíssima taxa de confusão entre as letras M, N e Q. Geometricamente, são os raríssimos sinais na Libras executados de "cabeça para baixo" (o punho fica anatomicamente acima dos dedos em relação à gravidade). Como o modelo não possuía invariância de rotação, depender do eixo Y da câmera para inferir se o dedo estava "apontando pro chão" gerava falhas se o usuário inclinasse a mão minimamente.
+**A Solução:** Em vez de normalizar todo o modelo rotacionando a mão inteira (o que destruiria o viés "gravitacional" das outras letras), criamos a métrica da **Bússola Interna da Mão**:
+- Calculamos um vetor ósseo rígido indo do Punho (0) à base do dedo médio (9).
+- Utilizamos a similaridade de cosseno (Cosine Similarity / Produto Escalar) para avaliar o vetor direcional de cada dedo em relação a essa Bússola.
+- Assim, o sistema parou de perguntar "O dedo aponta pro chão?" e passou a perguntar "O dedo está estendido paralelamente à palma da mão?".
+- O vetor saltou para exatas **100 dimensões**, conferindo a essas letras 100% de tolerância a inclinações e oscilações do punho do usuário.
+
+---
+
+### Desafio 9: Automação em Lote e Consistência da Vida Real vs Modelo
+**O Problema:** Conforme o escopo da documentação do TCC cresceu, rodar análises estatísticas manualmente sessão por sessão e lidar com arquivos soltos se tornou um pesadelo logístico. Além disso, identificamos que a "Mão Direita" do usuário estava sendo salva como "Mão Esquerda" no arquivo CSV final devido ao efeito "espelho" exigido pela câmera para manter a navegação intuitiva.
+**A Solução:**
+1. **Pipeline de Geração de Gráficos:** Criamos três scripts modulares de automação (`plot_logs.py`, `aggregate_sessions.py` e `plot_worst_classes.py`). Com um simples comando, o Python agora varre uma centena de sessões ao mesmo tempo, constrói os gráficos temporais (`_plot.png`), gráficos de frequência (`_class_frequency.png`) e agrupa todas as métricas em uma planilha mestre de excel (`session_summary.csv`), eliminando o trabalho braçal do pesquisador.
+2. **Fluxo de Câmera Contínuo:** Inserimos nativamente a biblioteca `tkinter` "por cima" do loop do OpenCV, permitindo que a "Tecla N" invoque um pop-up elegante perguntando o nome da nova sessão, sem necessidade de minimizar a câmera ou ir para o terminal, acelerando exponencialmente a coleta de múltiplos cenários pelo testador.
+3. **Consistência de "Handedness":** Implementamos uma trava cosmética final de log. Como o MediaPipe processa a câmera *já* espelhada (e portanto identifica a direita física como esquerda de fato), o nosso algoritmo de `normalize_landmarks` desfaz o erro matematicamente virando o eixo X. Contudo, o arquivo CSV ficava textualmente incorreto. Interceptamos a flag de Handedness antes dela tocar no arquivo CSV e fizemos a re-inversão (`if display_handedness == 'Left': return 'Right'`), garantindo que o log refletisse perfeitamente o membro físico utilizado na vida real.
 
 ---
 
 ## 3. Conclusão Parcial
-Até o momento, o núcleo de Visão Computacional, extração de características (Feature Engineering) e o pipeline de aprendizado de máquina (SVM + Scikit-Learn) estão finalizados e extremamente robustos. O fluxo principal de jogabilidade interativa também está operacional. O projeto está preparado para a apresentação final da disciplina.
+Até o momento, o núcleo de Visão Computacional, extração de características (Feature Engineering) e o pipeline de aprendizado de máquina (SVM + Scikit-Learn) estão finalizados e extremamente robustos. O fluxo principal de jogabilidade interativa e a central de análise científica em lote também estão operacionais.

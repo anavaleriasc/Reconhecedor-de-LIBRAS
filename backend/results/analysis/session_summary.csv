@@ -1,0 +1,11 @@
+session_name,condition,notes,duration_seconds,total_frames,valid_frames,hand_detection_rate,most_frequent_top1,average_top1_confidence,average_margin,class_switches,temporal_stability,completed_full_duration
+letra_A,unspecified,,10.09,90,90,1.0,A,0.9175,0.8834,0,1.0,True
+letra_F,unspecified,,10.09,90,90,1.0,F,0.5096,0.1433,10,0.9111,True
+letra_L,unspecified,,10.03,90,90,1.0,L,0.9367,0.9231,0,1.0,True
+letra_M,unspecified,,10.11,90,90,1.0,M,0.2271,0.0967,2,0.9889,True
+letra_N,unspecified,,10.1,90,90,1.0,N,0.781,0.7188,0,1.0,True
+letra_Q,unspecified,,10.03,89,89,1.0,Q,0.9094,0.9001,0,1.0,True
+letra_S,unspecified,,10.08,90,90,1.0,S,0.8305,0.7518,0,1.0,True
+letra_T,unspecified,,10.0,89,89,1.0,T,0.8446,0.8075,0,1.0,True
+letra_U,unspecified,,10.03,89,89,1.0,U,0.561,0.3756,0,1.0,True
+letra_V,unspecified,,10.1,90,90,1.0,V,0.7011,0.563,0,1.0,True

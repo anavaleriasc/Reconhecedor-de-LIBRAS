@@ -18,6 +18,7 @@ data/
 *.sw?
 .DS_Store
 .gemini/
+node_modules/
 
 # Modelos Gerados
 # O modelo treinado e o label encoder podem ser mantidos no repo se forem leves (como costumam ser em SVM),
@@ -27,3 +28,7 @@ data/
 # Logs e Artefatos do Agente
 logs/
 .agents/
+
+__pycache__/
+*.pyc
+node_modules/
