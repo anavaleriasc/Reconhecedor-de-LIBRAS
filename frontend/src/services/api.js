@@ -13,7 +13,7 @@
  *   (se omitido, cai no default abaixo)
  */
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000" || "https://reconhecedor-de-libras.onrender.com";
 
 /**
  * Wrapper de fetch que já monta a URL, define JSON por padrão e lança um
