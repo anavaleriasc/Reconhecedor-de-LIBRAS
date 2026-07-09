@@ -1,4 +1,4 @@
-# Relatório Técnico — Reconhecimento do Alfabeto Manual da Libras
+# Diário de Desenvolvimento — Reconhecimento do Alfabeto Manual da Libras
 **Trabalho Final da Disciplina de Visão Computacional**
 
 ## 1. Visão Geral do Projeto
