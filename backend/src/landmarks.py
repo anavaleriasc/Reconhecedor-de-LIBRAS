@@ -63,7 +63,7 @@ def extract_hand_landmarks(image_bgr):
     detector = get_detector()
     
     if detector is None:
-        return None, debug_image, False
+        return None, debug_image, False, None
 
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image_rgb)
