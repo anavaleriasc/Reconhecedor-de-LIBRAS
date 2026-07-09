@@ -16,8 +16,8 @@ import cv2
 import numpy as np
 import joblib
 
-from backend.src import config
-from backend.src.utils import garantir_diretorio, desenhar_texto
+from src import config
+from src.utils import garantir_diretorio, desenhar_texto
 
 
 def criar_parser() -> argparse.ArgumentParser:
@@ -109,8 +109,8 @@ def executar_predicao(args: argparse.Namespace) -> None:
     """Executa o pipeline completo de predição para uma imagem isolada."""
     # Importação local para garantir que os subagentes já tenham criado o módulo
     try:
-        from backend.src.landmarks import extract_hand_landmarks
-        from backend.src.features import normalize_landmarks, extract_features_from_landmarks
+        from src.landmarks import extract_hand_landmarks
+        from src.features import normalize_landmarks, extract_features_from_landmarks
     except ImportError as e:
         print(f"Erro ao importar módulos core. Verifique se foram implementados: {e}")
         sys.exit(1)

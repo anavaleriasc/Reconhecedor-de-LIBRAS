@@ -10,7 +10,7 @@ import unicodedata
 
 import cv2
 
-from backend.src import config
+from src import config
 
 
 def garantir_diretorio(caminho):

@@ -16,9 +16,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 
-from backend.src import config
-from backend.src.dataset import load_dataset
-from backend.src.utils import garantir_diretorio
+from src import config
+from src.dataset import load_dataset
+from src.utils import garantir_diretorio
 
 
 def main():

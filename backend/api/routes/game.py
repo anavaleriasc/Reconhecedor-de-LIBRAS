@@ -11,7 +11,7 @@ original.
 
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
-from backend.api.schemas.game import (
+from api.schemas.game import (
     GameResultResponse,
     GameStateResponse,
     NewGameRequest,
@@ -19,8 +19,8 @@ from backend.api.schemas.game import (
     ObserveRequest,
     ObserveResponse,
 )
-from backend.api.services import game_service
-from backend.api.services.game_service import GameSessionNotFoundError
+from api.services import game_service
+from api.services.game_service import GameSessionNotFoundError
 
 router = APIRouter(prefix="/game", tags=["game"])
 
