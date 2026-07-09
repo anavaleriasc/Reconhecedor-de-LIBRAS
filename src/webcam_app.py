@@ -12,7 +12,7 @@ Controles:
     Q      → Sair do jogo
 
 Uso:
-    python -m src.realtime_game --model models/classifier.joblib
+    python -m src.webcam_app --model models/classifier.joblib
 """
 
 import argparse

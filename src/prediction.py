@@ -2,7 +2,7 @@
 prediction.py — Módulo core de predição para uso pela API (FastAPI).
 
 Encapsula a MESMA lógica de interpretação usada em predict_image.py e
-realtime_game.py:
+webcam_app.py:
 
     frame (BGR) -> landmarks via MediaPipe -> normalização -> features
     -> predição do classificador (+ confiança)
@@ -17,7 +17,7 @@ A camada de API decide o que fazer com os erros (ex.: retornar HTTP 400/500)
 e como os frames chegam (upload multipart, base64 via JSON, WebSocket etc.).
 
 Este módulo também replica a MÁQUINA DE ESTADOS do jogo de soletração de
-realtime_game.py através da classe GameSession — só que em vez de reagir a
+webcam_app.py através da classe GameSession — só que em vez de reagir a
 teclas (SPACE/N/Q) num loop local com webcam, ela é dirigida por chamadas
 explícitas (observe/confirm/skip/finalizar_forcado), que a API expõe como
 endpoints REST ou mensagens de WebSocket para o front em React.
@@ -85,7 +85,7 @@ def carregar_modelo(model_path: Optional[str] = None, encoder_path: Optional[str
     """
     Carrega (ou reaproveita, se já carregado) o modelo e o label encoder.
 
-    Ao contrário das versões em predict_image.py/realtime_game.py, NÃO chama
+    Ao contrário das versões em predict_image.py/webcam_app.py, NÃO chama
     sys.exit() em caso de erro — lança RuntimeError, para a API decidir como
     responder (ex.: HTTP 500 com detail=str(e)).
     """
@@ -176,7 +176,7 @@ def predict_frame(
     include_debug_image: bool = False,
 ) -> PredictionResult:
     """
-    Executa o mesmo pipeline usado em predict_image.py / realtime_game.py:
+    Executa o mesmo pipeline usado em predict_image.py / webcam_app.py:
     frame -> landmarks (MediaPipe) -> normalização -> features -> predição.
 
     Pode receber modelo/label_encoder já carregados (recomendado dentro da
@@ -262,7 +262,7 @@ def predict_from_base64(
 
 # =============================================================================
 # Estado de uma partida do jogo de soletração
-# (mesma jogabilidade de realtime_game.py, sem OpenCV/webcam/teclado)
+# (mesma jogabilidade de webcam_app.py, sem OpenCV/webcam/teclado)
 # =============================================================================
 
 STATUS_AGUARDANDO = "AGUARDANDO"
@@ -273,7 +273,7 @@ STATUS_INCORRETO = "INCORRETO"
 @dataclass
 class GameSession:
     """
-    Réplica stateful (em memória) da lógica de jogo de realtime_game.py,
+    Réplica stateful (em memória) da lógica de jogo de webcam_app.py,
     adaptada para ser dirigida por chamadas de API/WebSocket em vez de
     teclas (SPACE/N/Q) e uma janela OpenCV local.
 
