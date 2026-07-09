@@ -1,5 +1,10 @@
 # Sistema Interativo de Reconhecimento do Alfabeto Manual de Libras
 
+## Equipe
+
+- [Ana Valéria Silva Coelho](https://github.com/anavaleriasc)
+- [João Victor Cruz Silva](https://github.com/joaocruzs)
+
 ## Descrição
 
 Este projeto implementa um sistema de **visão computacional híbrida** para reconhecimento
