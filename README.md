@@ -6,7 +6,9 @@ Este projeto implementa um sistema de **visão computacional híbrida** para rec
 das letras do alfabeto manual da **Língua Brasileira de Sinais (Libras)**. O sistema utiliza
 o **MediaPipe Hands** para detecção precisa e extração de landmarks (21 pontos 3D da mão),
 e em seguida calcula descritores geométricos que são alimentados em classificadores
-clássicos de aprendizado de máquina. Assista a demonstração de uso: `https://youtu.be/tmEsHRk0ohA`
+clássicos de aprendizado de máquina.
+
+**[Assista a demonstração de uso](https://youtu.be/tmEsHRk0ohA)**
 
 ## Justificativa Técnica
 
