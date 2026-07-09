@@ -28,6 +28,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Create React App
         "http://localhost:5173",  # Vite
+        "https://reconhecedor-de-libras-8nulq8lso-bdrg-2.vercel.app/",  
     ],
     allow_credentials=True,
     allow_methods=["*"],
