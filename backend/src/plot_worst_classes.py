@@ -8,7 +8,7 @@ Uso:
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-from backend.src import config
+from src import config
 
 def main():
     report_path = os.path.join(config.RESULTS_DIR, "classification_report.csv")

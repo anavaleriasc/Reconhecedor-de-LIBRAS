@@ -17,7 +17,7 @@ import threading
 import uuid
 from typing import Dict, Tuple
 
-from backend.src.prediction import GameSession
+from src.prediction import GameSession
 
 
 class GameSessionManager:

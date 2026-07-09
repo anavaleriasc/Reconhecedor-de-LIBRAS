@@ -10,8 +10,8 @@ domínio (sessão inexistente) são sinalizados com GameSessionNotFoundError;
 quem decide o código HTTP é a camada de rotas.
 """
 
-from backend.src.prediction import GameSession, PredictionResult, decode_base64_image
-from backend.api.game import game_session_manager
+from src.prediction import GameSession, PredictionResult, decode_base64_image
+from api.game import game_session_manager
 
 
 class GameSessionNotFoundError(Exception):

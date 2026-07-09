@@ -8,9 +8,9 @@ from collections import deque, Counter
 import cv2
 import numpy as np
 
-from backend.src import config
-from backend.src.utils import garantir_diretorio
-from backend.src.ui import UIRenderer
+from src import config
+from src.utils import garantir_diretorio
+from src.ui import UIRenderer
 
 class AnalysisSession:
     def __init__(self, metadata, output_dir="results/analysis"):
@@ -285,8 +285,8 @@ def run_analysis_mode(modelo, label_encoder, camera_index: int, metadata: dict =
         metadata = {}
         
     try:
-        from backend.src.landmarks import extract_hand_landmarks
-        from backend.src.features import normalize_landmarks, extract_features_from_landmarks
+        from src.landmarks import extract_hand_landmarks
+        from src.features import normalize_landmarks, extract_features_from_landmarks
     except ImportError as e:
         print(f"Erro ao carregar os módulos core: {e}")
         sys.exit(1)

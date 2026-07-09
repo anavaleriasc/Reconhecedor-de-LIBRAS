@@ -12,7 +12,7 @@ de src.prediction, para poder ser testado sem subir um servidor.
 
 from typing import Optional
 
-from backend.src.prediction import (
+from src.prediction import (
     PredictionResult,
     carregar_modelo,
     predict_from_base64,

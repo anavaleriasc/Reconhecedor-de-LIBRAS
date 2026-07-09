@@ -9,8 +9,8 @@ import os
 import glob
 import json
 import csv
-from backend.src import config
-from backend.src.utils import garantir_diretorio
+from src import config
+from src.utils import garantir_diretorio
 
 def main():
     summaries_dir = os.path.join(config.RESULTS_DIR, "analysis", "summaries")
