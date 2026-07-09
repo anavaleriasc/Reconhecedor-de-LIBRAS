@@ -27,8 +27,8 @@ import cv2
 import numpy as np
 import joblib
 
-from src import config
-from src.utils import normalizar_texto, desenhar_texto
+from backend.src import config
+from backend.src.utils import normalizar_texto, desenhar_texto
 
 
 # =============================================================================
@@ -160,7 +160,7 @@ def desenhar_hud(
     """
     Desenha o Heads-Up Display (HUD) moderno com Pillow.
     """
-    from src.ui import UIRenderer
+    from backend.src.ui import UIRenderer
     
     ui = UIRenderer(frame)
     altura_frame, largura_frame = frame.shape[:2]
@@ -310,8 +310,8 @@ def loop_principal(
         texto_normalizado: Texto normalizado (somente A-Z).
     """
     try:
-        from src.landmarks import extract_hand_landmarks
-        from src.features import normalize_landmarks, extract_features_from_landmarks
+        from backend.src.landmarks import extract_hand_landmarks
+        from backend.src.features import normalize_landmarks, extract_features_from_landmarks
     except ImportError as e:
         print(f"Erro ao carregar os módulos core: {e}")
         sys.exit(1)
@@ -460,7 +460,7 @@ def loop_principal(
 
     # Mostrar Tela Final Visual se o frame existir
     if 'frame_final' in locals():
-        from src.ui import UIRenderer
+        from backend.src.ui import UIRenderer
         ui = UIRenderer(frame_final)
         altura, largura = frame_final.shape[:2]
         cx, cy = largura // 2, altura // 2
@@ -540,7 +540,7 @@ def main():
     else:
         # Executar modo de análise avançado
         try:
-            from src.analysis_mode import run_analysis_mode
+            from backend.src.analysis_mode import run_analysis_mode
             from datetime import datetime
         except ImportError as e:
             print(f"Erro ao carregar o módulo de análise: {e}")

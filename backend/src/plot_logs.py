@@ -11,8 +11,8 @@ import glob
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-from src import config
-from src.utils import garantir_diretorio
+from backend.src import config
+from backend.src.utils import garantir_diretorio
 
 def get_all_logs(log_dir):
     """Encontra todos os arquivos CSV no diretório."""

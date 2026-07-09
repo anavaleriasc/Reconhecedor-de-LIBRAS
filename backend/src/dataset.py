@@ -10,9 +10,9 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from src import config
-from src.landmarks import extract_hand_landmarks
-from src.features import normalize_landmarks, extract_features_from_landmarks
+from backend.src import config
+from backend.src.landmarks import extract_hand_landmarks
+from backend.src.features import normalize_landmarks, extract_features_from_landmarks
 
 
 def load_dataset(data_dir=None):

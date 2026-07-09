@@ -6,7 +6,7 @@ Este projeto implementa um sistema de **visão computacional híbrida** para rec
 das letras do alfabeto manual da **Língua Brasileira de Sinais (Libras)**. O sistema utiliza
 o **MediaPipe Hands** para detecção precisa e extração de landmarks (21 pontos 3D da mão),
 e em seguida calcula descritores geométricos que são alimentados em classificadores
-clássicos de aprendizado de máquina.
+clássicos de aprendizado de máquina. Assista a demonstração de uso: `https://youtu.be/tmEsHRk0ohA`
 
 ## Justificativa Técnica
 
@@ -46,87 +46,94 @@ Classificador clássico (SVM / KNN / Random Forest)
 Letra prevista
 ```
 
-## Estrutura do Projeto
-
+## Estrutura do projeto
 ```
 reconhecedor-de-LIBRAS/
-├── README.md                         
-├── requirements.txt                  # Dependências do projeto
+├── README.md
+├── .gitignore
 │
-├── api/                              
-│   ├── game.py                       # Gerenciamento de sessões
-│   ├── main.py                       # Ponto de entrada da API
-│   │
-│   ├── routes/                      
-│   │   ├── game.py                  
-│   │   └── prediction.py             
-│   ├── schemas/                      
-│   │   ├── game.py                   
-│   │   └── prediction.py            
-│   └── services/                    
-│       ├── game_service.py         
-│       └── prediction_service.py    
-│
-├── data/
-│   ├── raw/                          # Dataset organizado por letra
-│   │   ├── A/                        # Imagens da letra A
-│   │   ├── B/                        # Imagens da letra B
-│   │   ├── ...
-│   │   └── Z/                        # Imagens da letra Z
-│   ├── processed/                    # Dados processados (features extraídas)
-│   └── samples/                      # Imagens de exemplo para teste
-│ 
-├── models/
-│   ├── classifier.joblib             # Modelo treinado
-│   └── label_encoder.joblib          # Codificador de rótulos
-│ 
-├── results/
-│   ├── figures/                      # Gráficos, matrizes de confusão, etc. (gerados pelo evaluate.py)
-│   ├── classification_report.csv     # Métricas por classe, geradas pelo evaluate.py
-│   ├── worst_f1_classes.png          # Top 10 piores classes por F1-score (plot_worst_classes.py)
-│   └── analysis/                     # Saída do Modo Análise (webcam_app.py --mode analysis)
-│       ├── logs/                     # Um .csv por sessão gravada, frame a frame
-│       ├── summaries/                # Um .json de resumo por sessão + os .png gerados por plot_logs.py
-│       ├── frames/
-│       │   └── <sessão>/             # Capturas automáticas (a cada 2s) e manuais (tecla F)
-│       └── session_summary.csv       # Consolidado de todas as sessões (aggregate_sessions.py)
-│ 
-├── frontend/                         # Cliente React que consome a api/
+├── frontend/                         # Cliente React que consome a API
 │   ├── public/
-│   └── src/
-│       ├── main.jsx                  # Ponto de entrada do React
-│       ├── App.jsx                   # Rotas (Home / Game / Results)
-│       ├── global.css                # Tokens de design e estilos base
-│       ├── pages/
-│       │   ├── Home.jsx              # Digitação da palavra/frase e criação da sessão
-│       │   ├── Game.jsx              # Captura da webcam e jogo em si
-│       │   └── Results.jsx           # Resultado final da partida
-│       └── services/
-│           └── api.js                # Camada única de chamadas HTTP/WebSocket à api/
-│           # HUD, Header e Card ainda serão extraídos como componentes próprios
-│ 
-└── src/
-    ├── __init__.py                   # Inicialização do pacote
-    ├── aggregate_sessions.py         # Consolida os JSONs de resumo do Modo Análise em um CSV único
-    ├── analysis_mode.py              # Lógica do Modo Análise (gravação, captura automática, HUD de diagnóstico)
-    ├── config.py                     # Configurações globais do projeto
-    ├── dataset.py                    # Carregamento do dataset
-    ├── evaluate.py                   # Avaliação do modelo
-    ├── features.py                   # Normalização e descritores geométricos
-    ├── landmarks.py                  # Detecção e extração de landmarks via MediaPipe
-    ├── plot_logs.py                  # Gráficos de linha do tempo e frequência a partir dos logs CSV
-    ├── plot_worst_classes.py         # Ranking das 10 piores classes por F1-score
-    ├── predict_image.py              # Predição de uma imagem isolada (CLI)
-    ├── prediction.py                 # Módulo stateless de predição usado exclusivamente pela api/
-    ├── webcam_app.py                 # Modo interativo com webcam (jogo e análise), antigo realtime_game.py
-    ├── train.py                      # Treinamento do classificador
-    ├── ui.py                         # Renderização do OpenCV
-    └── utils.py                      # Funções utilitárias
+│   ├── src/
+│   │   ├── main.jsx                  # Ponto de entrada do React
+│   │   ├── App.jsx                   # Rotas (Home / Game / Results)
+│   │   ├── global.css                # Tokens de design e estilos base
+│   │   ├── pages/
+│   │   │   ├── Home.jsx              # Digitação da palavra/frase e criação da sessão
+│   │   │   ├── Game.jsx              # Captura da webcam e jogo em si
+│   │   │   └── Results.jsx           # Resultado final da partida
+│   │   └── services/
+│   │       └── api.js                # Camada única de chamadas HTTP/WebSocket à API
+│   │       # HUD, Header e Card ainda serão extraídos como componentes próprios
+│   ├── package.json
+│   └── vite.config.js
+│
+└── backend/
+    ├── requirements.txt              # Dependências do backend
+    │
+    ├── api/
+    │   ├── game.py                   # Gerenciamento de sessões
+    │   ├── main.py                   # Ponto de entrada da API
+    │   │
+    │   ├── routes/
+    │   │   ├── game.py
+    │   │   └── prediction.py
+    │   │
+    │   ├── schemas/
+    │   │   ├── game.py
+    │   │   └── prediction.py
+    │   │
+    │   └── services/
+    │       ├── game_service.py
+    │       └── prediction_service.py
+    │
+    ├── src/
+    │   ├── __init__.py                   # Inicialização do pacote
+    │   ├── aggregate_sessions.py         # Consolida os JSONs de resumo do Modo Análise em um CSV único
+    │   ├── analysis_mode.py              # Lógica do Modo Análise (gravação, captura automática, HUD de diagnóstico)
+    │   ├── config.py                     # Configurações globais do projeto
+    │   ├── dataset.py                    # Carregamento do dataset
+    │   ├── evaluate.py                   # Avaliação do modelo
+    │   ├── features.py                   # Normalização e descritores geométricos
+    │   ├── landmarks.py                  # Detecção e extração de landmarks via MediaPipe
+    │   ├── plot_logs.py                  # Gráficos de linha do tempo e frequência a partir dos logs CSV
+    │   ├── plot_worst_classes.py         # Ranking das 10 piores classes por F1-score
+    │   ├── predict_image.py              # Predição de uma imagem isolada (CLI)
+    │   ├── prediction.py                 # Módulo stateless de predição usado exclusivamente pela API
+    │   ├── webcam_app.py                 # Modo interativo com webcam (jogo e análise), antigo realtime_game.py
+    │   ├── train.py                      # Treinamento do classificador
+    │   ├── ui.py                         # Renderização do OpenCV
+    │   └── utils.py                      # Funções utilitárias
+    │
+    ├── models/
+    │   ├── classifier.joblib             # Modelo treinado
+    │   ├── label_encoder.joblib          # Codificador de rótulos
+    │   └── hand_landmarker.task          # Modelo do MediaPipe Hands
+    │
+    ├── data/
+    │   ├── raw/                          # Dataset organizado por letra
+    │   │   ├── A/                        # Imagens da letra A
+    │   │   ├── B/
+    │   │   ├── ...
+    │   │   └── Z/                        # Imagens da letra Z
+    │   ├── processed/                    # Dados processados (features extraídas)
+    │   └── samples/                      # Imagens de exemplo para teste
+    │
+    └── results/
+        ├── figures/                      # Gráficos, matrizes de confusão, etc. (gerados pelo evaluate.py)
+        ├── classification_report.csv     # Métricas por classe, geradas pelo evaluate.py
+        ├── worst_f1_classes.png          # Top 10 piores classes por F1-score (plot_worst_classes.py)
+        └── analysis/
+            ├── logs/                     # Um .csv por sessão gravada, frame a frame
+            ├── summaries/                # Um .json de resumo por sessão + os .png gerados por plot_logs.py
+            ├── frames/
+            │   └── <sessão>/             # Capturas automáticas (a cada 2s) e manuais (tecla F)
+            └── session_summary.csv       # Consolidado de todas as sessões (aggregate_sessions.py)
 ```
 
-> **Nota sobre `prediction.py`:** ele existe à parte de `webcam_app.py` e `analysis_mode.py` porque estes dois dependem de janela do OpenCV, teclado e loop bloqueante — nada disso faz sentido dentro de uma requisição HTTP. `prediction.py` reaproveita os mesmos módulos de baixo nível (`src.landmarks`, `src.features`) e replica a mesma máquina de estados do jogo (`GameSession`), mas devolve dicionários/objetos Python simples em vez de desenhar na tela. É o único módulo importado pela `api/`.
+> **Nota sobre `prediction.py`:** ele existe à parte de `webcam_app.py` e `analysis_mode.py` porque estes dois dependem de janela do OpenCV, teclado e loop bloqueante — nada disso faz sentido dentro de uma requisição HTTP. `prediction.py` reaproveita os mesmos módulos de baixo nível (`backend.src.landmarks`, `backend.src.features`) e replica a mesma máquina de estados do jogo (`GameSession`), mas devolve dicionários/objetos Python simples em vez de desenhar na tela. É o único módulo de `src/` importado pela `backend/api/`.
 
-> **Nota Importante:** As pastas `models/` e `results/` deste repositório já vêm acompanhadas de um **modelo previamente treinado** (junto com os relatórios e gráficos técnicos gerados durante o seu treinamento) e também contêm **resultados e evidências de experimentos** reais feitos através do Modo de Análise. Dessa forma, você pode iniciar testes com a câmera imediatamente, sem a necessidade de baixar o dataset para treinar o classificador do zero.
+> **Nota Importante:** As pastas `backend/models/` e `backend/results/` deste repositório já vêm acompanhadas de um **modelo previamente treinado** (junto com os relatórios e gráficos técnicos gerados durante o seu treinamento) e também contêm **resultados e evidências de experimentos** reais feitos através do Modo de Análise. Dessa forma, você pode iniciar testes com a câmera imediatamente, sem a necessidade de baixar o dataset para treinar o classificador do zero.
 
 ## Dependências
 
@@ -153,13 +160,15 @@ python -m venv .venv
 # Ativar no Windows (PowerShell):
 .venv\Scripts\Activate.ps1
 
-# 3. Instalar dependências
-pip install -r requirements.txt
+# 3. Instalar dependências do backend
+pip install -r backend/requirements.txt
 ```
+
+> Todo o código Python (treinamento, avaliação, modo webcam, API) agora vive em `backend/`. Os comandos das seções abaixo assumem que você está na raiz do repositório com o ambiente virtual ativado, e usam o prefixo `backend.` para os módulos (ex: `python -m backend.src.train`) e `backend/` para caminhos de dados, modelos e resultados.
 
 ## Organização do Dataset
 
-O dataset deve ser organizado na pasta `data/` com uma subpasta para cada letra do
+O dataset deve ser organizado na pasta `backend/data/` com uma subpasta para cada letra do
 alfabeto. Cada subpasta deve conter imagens da respectiva letra em formato JPG, PNG ou
 similar:
 
@@ -183,7 +192,7 @@ data/
 Para o treinamento deste modelo, foi utilizado o seguinte dataset público do Kaggle:
 - **[Libras Brazilian Sign Language Dataset](https://www.kaggle.com/datasets/gabrielbraga2536/libras-brazilian-sign-language?select=dataset)**
 
-Ele deve ser baixado, extraído e organizado dentro da pasta `data/` conforme a estrutura descrita acima.
+Ele deve ser baixado, extraído e organizado dentro da pasta `backend/data/` conforme a estrutura descrita acima.
 
 ### Dicas para um bom dataset
 
@@ -193,21 +202,21 @@ Ele deve ser baixado, extraído e organizado dentro da pasta `data/` conforme a 
 
 ## Treinamento
 
-Para treinar o classificador com o dataset organizado em `data/`:
+Para treinar o classificador com o dataset organizado em `backend/data/`:
 
 ```bash
 .venv\Scripts\Activate.ps1
-python -m src.train --data data
+python -m backend.src.train --data backend/data
 ```
 
 ### Opções disponíveis
 
-| Argumento         | Descrição                                      | Padrão      |
-|-------------------|-------------------------------------------------|-------------|
-| `--data`          | Caminho para o diretório do dataset             | `data`  |
+| Argumento         | Descrição                                      | Padrão          |
+|-------------------|-------------------------------------------------|-----------------|
+| `--data`          | Caminho para o diretório do dataset             | `backend/data`  |
 
-O modelo treinado será salvo em `models/classifier.joblib` e o codificador de rótulos em
-`models/label_encoder.joblib`.
+O modelo treinado será salvo em `backend/models/classifier.joblib` e o codificador de rótulos em
+`backend/models/label_encoder.joblib`.
 
 ## Avaliação
 
@@ -215,12 +224,12 @@ Para avaliar o modelo treinado utilizando o dataset:
 
 ```bash
 .venv\Scripts\Activate.ps1
-python -m src.evaluate --data data --model models/classifier.joblib
+python -m backend.src.evaluate --data backend/data --model backend/models/classifier.joblib
 ```
 
 O módulo de avaliação gera:
 - **Relatório de classificação** com precisão, recall e F1-score por letra.
-- **Matriz de confusão** salva em `results/figures/`.
+- **Matriz de confusão** salva em `backend/results/figures/`.
 - **Acurácia geral** do modelo.
 
 ## Predição de Imagem Isolada
@@ -229,18 +238,18 @@ Para classificar uma imagem individual:
 
 ```bash
 .venv\Scripts\Activate.ps1
-python -m src.predict_image --image data/samples/teste.jpg --model models/classifier.joblib
+python -m backend.src.predict_image --image backend/data/samples/teste.jpg --model backend/models/classifier.joblib
 ```
 
 ### Opções disponíveis
 
-| Argumento         | Descrição                                      | Padrão                               |
-|-------------------|-------------------------------------------------|---------------------------------------|
-| `--image`         | Caminho para a imagem de entrada (obrigatório)  | —                                     |
-| `--model`         | Caminho para o modelo treinado                  | `models/classifier.joblib`            |
-| `--label-encoder` | Caminho para o codificador de rótulos           | `models/label_encoder.joblib`         |
-| `--output`        | Caminho para salvar a visualização              | `results/figures/predict_image_result.png` |
-| `--show`          | Exibe a imagem em janela do OpenCV              | desativado                            |
+| Argumento         | Descrição                                      | Padrão                                       |
+|-------------------|-------------------------------------------------|-----------------------------------------------|
+| `--image`         | Caminho para a imagem de entrada (obrigatório)  | —                                             |
+| `--model`         | Caminho para o modelo treinado                  | `backend/models/classifier.joblib`            |
+| `--label-encoder` | Caminho para o codificador de rótulos           | `backend/models/label_encoder.joblib`         |
+| `--output`        | Caminho para salvar a visualização              | `backend/results/figures/predict_image_result.png` |
+| `--show`          | Exibe a imagem em janela do OpenCV              | desativado                                    |
 
 A visualização gerada inclui os **landmarks** e conexões da mão e a **letra prevista**
 com a respectiva **confiança**.
@@ -252,7 +261,7 @@ solicita que reproduza cada letra com a mão na frente da webcam:
 
 ```bash
 .venv\Scripts\Activate.ps1
-python -m src.webcam_app --model models/classifier.joblib
+python -m backend.src.webcam_app --model backend/models/classifier.joblib
 ```
 
 ### Como funciona
@@ -278,8 +287,8 @@ python -m src.webcam_app --model models/classifier.joblib
 
 | Argumento         | Descrição                                      | Padrão                               |
 |-------------------|-------------------------------------------------|---------------------------------------|
-| `--model`         | Caminho para o modelo treinado                  | `models/classifier.joblib`            |
-| `--label-encoder` | Caminho para o codificador de rótulos           | `models/label_encoder.joblib`         |
+| `--model`         | Caminho para o modelo treinado                  | `backend/models/classifier.joblib`    |
+| `--label-encoder` | Caminho para o codificador de rótulos           | `backend/models/label_encoder.joblib` |
 | `--mode`          | Define o funcionamento principal do app: `game` ou `analysis` | `analysis`             |
 | `--camera`        | Índice da câmera a utilizar                     | `0`                                   |
 
@@ -290,7 +299,7 @@ python -m src.webcam_app --model models/classifier.joblib
 O sistema conta com um **Modo Análise Avançado** construído especificamente para depuração científica do classificador (foco em coletar métricas e diagnosticar problemas). Ele é executado por padrão ao chamar:
 
 ```bash
-python -m src.webcam_app
+python -m backend.src.webcam_app
 ```
 *(Para acessar o Modo Jogo, utilize `--mode game`)*
 
@@ -315,16 +324,16 @@ Você pode utilizar os seguintes controles no teclado para gerar dados reais de 
 
 | Tecla   | Ação                                      |
 |---------|-------------------------------------------|
-| `S`     | **Iniciar/Parar Gravação da Sessão**. Cada gravação tem um alvo fixo de **10 segundos** e para sozinha ao atingir esse tempo (dá para parar antes apertando `S` de novo). Gera um `.csv` frame a frame em `results/analysis/logs/` e um `.json` de resumo em `results/analysis/summaries/`. |
+| `S`     | **Iniciar/Parar Gravação da Sessão**. Cada gravação tem um alvo fixo de **10 segundos** e para sozinha ao atingir esse tempo (dá para parar antes apertando `S` de novo). Gera um `.csv` frame a frame em `backend/results/analysis/logs/` e um `.json` de resumo em `backend/results/analysis/summaries/`. |
 | `N`     | **Nova Sessão**. Encerra a gravação atual (se houver) e abre uma janela para digitar o nome da próxima sessão, reiniciando todos os contadores. |
-| `F`     | **Salvar Captura Manual**. A qualquer momento (gravando ou não), salva a imagem original, a imagem com landmarks e um `.json` com a predição daquele instante em `results/analysis/frames/<sessão>/`. |
+| `F`     | **Salvar Captura Manual**. A qualquer momento (gravando ou não), salva a imagem original, a imagem com landmarks e um `.json` com a predição daquele instante em `backend/results/analysis/frames/<sessão>/`. |
 | `Q`     | Sair da análise                           |
 
 Além da captura manual (`F`), **enquanto a gravação está ativa o sistema também salva sozinho** uma captura automática nos instantes 2s, 4s, 6s, 8s e 10s da sessão — sem precisar apertar nada. Isso garante uma amostra mínima de imagens mesmo que você esqueça de usar `F`.
 
 ### Exemplo de Resumo de Sessão (JSON)
 
-O `.json` salvo em `results/analysis/summaries/` tem mais campos do que aparecem no HUD — por exemplo:
+O `.json` salvo em `backend/results/analysis/summaries/` tem mais campos do que aparecem no HUD — por exemplo:
 
 ```json
 {
@@ -358,19 +367,19 @@ O `.json` salvo em `results/analysis/summaries/` tem mais campos do que aparecem
 Para facilitar a documentação científica do seu TCC, criamos 4 scripts que processam os dados gerados pelo Modo Análise:
 
 1. **Gráficos da Sessão (Linhas e Barras)**
-   Para cada CSV em `results/analysis/logs/` (ou um específico via `--log caminho.csv`), gera dois PNGs dentro de `results/analysis/summaries/`: `<sessão>_plot.png` (probabilidades Top-3, margem de incerteza e estabilidade de classe ao longo do tempo) e `<sessão>_class_frequency.png` (barras com a frequência de cada letra detectada).
+   Para cada CSV em `backend/results/analysis/logs/` (ou um específico via `--log caminho.csv`), gera dois PNGs dentro de `backend/results/analysis/summaries/`: `<sessão>_plot.png` (probabilidades Top-3, margem de incerteza e estabilidade de classe ao longo do tempo) e `<sessão>_class_frequency.png` (barras com a frequência de cada letra detectada).
    ```bash
-   python -m src.plot_logs
+   python -m backend.src.plot_logs
    ```
 2. **Consolidação de Sessões**
-   Varre todos os JSONs de `results/analysis/summaries/` e agrupa um subconjunto das métricas (duração, detecção de mão, trocas de classe, estabilidade etc.) em `results/analysis/session_summary.csv`. Campos mais detalhados de cada sessão (como `top3_frequent_classes` ou `auto_captures_saved`) permanecem só nos JSONs individuais.
+   Varre todos os JSONs de `backend/results/analysis/summaries/` e agrupa um subconjunto das métricas (duração, detecção de mão, trocas de classe, estabilidade etc.) em `backend/results/analysis/session_summary.csv`. Campos mais detalhados de cada sessão (como `top3_frequent_classes` ou `auto_captures_saved`) permanecem só nos JSONs individuais.
    ```bash
-   python -m src.aggregate_sessions
+   python -m backend.src.aggregate_sessions
    ```
 3. **Calcanhar de Aquiles (Piores Classes)**
-   Lê `results/classification_report.csv` (gerado pelo `evaluate.py`) e desenha, em `results/worst_f1_classes.png`, um gráfico ranqueando as 10 letras com menor F1-Score.
+   Lê `backend/results/classification_report.csv` (gerado pelo `evaluate.py`) e desenha, em `backend/results/worst_f1_classes.png`, um gráfico ranqueando as 10 letras com menor F1-Score.
    ```bash
-   python -m src.plot_worst_classes
+   python -m backend.src.plot_worst_classes
    ```
 
 ### Exemplo de resultado final (Modo Jogo)
@@ -396,11 +405,11 @@ Ao mesmo tempo, a janela da webcam mostra uma tela de "FIM DE JOGO" com a pontua
 
 ## API (FastAPI)
 
-A API expõe o reconhecimento e a jogabilidade para o `frontend/` via HTTP/WebSocket, sem depender de OpenCV/janelas. Ela é construída em cima de `src/prediction.py` (veja a nota na Estrutura do Projeto acima).
+A API expõe o reconhecimento e a jogabilidade para o `frontend/` via HTTP/WebSocket, sem depender de OpenCV/janelas. Ela é construída em cima de `backend/src/prediction.py` (veja a nota na Estrutura do Projeto acima).
 
 ```bash
-# a partir da raiz do projeto, com src/ e api/ como pacotes irmãos
-uvicorn api.main:app --reload
+# a partir da raiz do projeto, com backend/src e backend/api como pacotes irmãos
+uvicorn backend.api.main:app --reload
 ```
 
 Documentação interativa em `http://localhost:8000/docs`. Principais endpoints:
@@ -413,14 +422,6 @@ Documentação interativa em `http://localhost:8000/docs`. Principais endpoints:
 | `POST /game/{id}/confirm` `/skip` `/finish` | Equivalentes às teclas `SPACE`/`N`/`Q` do jogo local |
 | `GET /game/{id}` e `/game/{id}/result` | Estado atual e resultado final da partida |
 | `WS /game/{id}/ws` | Canal único para o mesmo fluxo acima via mensagens JSON |
-
-### `prediction.py` ainda é necessário?
-
-**Sim, e não precisou de nenhuma mudança de lógica** depois da renomeação de `realtime_game.py` para `webcam_app.py` — só corrigi os comentários que ainda citavam o nome antigo. A razão de ele continuar existindo separado de `webcam_app.py`/`analysis_mode.py`:
-
-- Os três módulos fazem a **mesma sequência de inferência** (`extract_hand_landmarks` → `normalize_landmarks` → `extract_features_from_landmarks` → `modelo.predict`), importando das mesmas fontes (`src.landmarks`, `src.features`). Se você alterar essa lógica em `src/features.py` ou `src/landmarks.py`, os três se beneficiam automaticamente, sem precisar tocar em `prediction.py`.
-- O que **não é compartilhado** é a "cola" em volta disso — como `webcam_app.py` lê teclado e desenha na tela, e `prediction.py` só devolve dicionários — por isso essa parte está duplicada de propósito entre os três arquivos. A fórmula de pontuação (`acertos / (acertos + erros) * 100`) é idêntica nos dois lugares, então o resultado de uma partida via API bate com o resultado de uma partida local.
-- Se no futuro vocês mudarem a fórmula de pontuação, o formato do HUD ou as regras do jogo (o que conta como erro, por exemplo) diretamente em `webcam_app.py`, será preciso replicar manualmente a mudança na classe `GameSession` de `prediction.py` — não há um único lugar fazendo isso hoje.
 
 ## Frontend
 

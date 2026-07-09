@@ -25,9 +25,9 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 
-from src import config
-from src.dataset import load_dataset
-from src.utils import garantir_diretorio
+from backend.src import config
+from backend.src.dataset import load_dataset
+from backend.src.utils import garantir_diretorio
 
 
 def main():

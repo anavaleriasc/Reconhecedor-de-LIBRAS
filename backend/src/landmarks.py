@@ -7,6 +7,10 @@ import numpy as np
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_PATH = BASE_DIR / "models" / "hand_landmarker.task"
 
 # Conexões dos dedos para desenho manual (já que drawing_utils não existe no Python 3.12)
 HAND_CONNECTIONS = [
@@ -25,7 +29,7 @@ def get_detector():
     global _detector
     if _detector is None:
         try:
-            base_options = python.BaseOptions(model_asset_path='models/hand_landmarker.task')
+            base_options = python.BaseOptions(model_asset_path=str(MODEL_PATH))
             options = vision.HandLandmarkerOptions(
                 base_options=base_options,
                 num_hands=1,

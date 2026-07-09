@@ -156,9 +156,11 @@ export default function GameDidatico() {
         <div className="game-layout">
           <div className="container">
             <HUD
-              sessionId={sessionId} indiceAtual={indiceAtual}
-              acertos={acertos}     erros={erros}          
-              tempo={tempo}         total={totalLetras || texto.length}
+              indiceAtual={indiceAtual}
+              acertos={acertos}
+              erros={erros}          
+              tempo={tempo}
+              total={totalLetras || texto.length}
             />
 
             <Card label="Sinal esperado" className="game-target-card" active={reconhecimentoBate} >

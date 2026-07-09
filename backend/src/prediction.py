@@ -33,10 +33,10 @@ import cv2
 import numpy as np
 import joblib
 
-from src import config
-from src.utils import normalizar_texto
-from src.landmarks import extract_hand_landmarks
-from src.features import normalize_landmarks, extract_features_from_landmarks
+from backend.src import config
+from backend.src.utils import normalizar_texto
+from backend.src.landmarks import extract_hand_landmarks
+from backend.src.features import normalize_landmarks, extract_features_from_landmarks
 
 
 # =============================================================================

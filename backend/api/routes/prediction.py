@@ -3,8 +3,8 @@ sem estado de jogo). Útil para telas de calibração/teste no front."""
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from api.schemas.prediction import PredictRequest, PredictResponse
-from api.services import prediction_service
+from backend.api.schemas.prediction import PredictRequest, PredictResponse
+from backend.api.services import prediction_service
 
 router = APIRouter(prefix="/predict", tags=["predict"])
 

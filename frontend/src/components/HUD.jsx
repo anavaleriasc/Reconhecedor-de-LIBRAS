@@ -2,13 +2,9 @@
  * HUD — barra de status do jogo. Recebe dados já prontos (não conhece a
  * API); Game.jsx é responsável por calcular/formatar e repassar via props.
  */
-export default function HUD({ sessionId, acertos = 0, erros = 0, indiceAtual = 0, total = 0, tempo }) {
+export default function HUD({ acertos = 0, erros = 0, indiceAtual = 0, total = 0, tempo }) {
   return (
     <div className="hud">
-      <div className="hud-stat">
-        <span className="hud-stat-label">Sessão</span>
-        <span className="hud-stat-value mono-data">{sessionId ?? "—"}</span>
-      </div>
 
       <div className="hud-divider" />
 

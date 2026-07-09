@@ -162,9 +162,11 @@ export default function Game() {
         <div className="game-layout">
           <div className="container">
             <HUD
-              sessionId={sessionId} indiceAtual={indiceAtual}
-              acertos={acertos}     erros={erros}          
-              tempo={tempo}         total={totalLetras || texto.length}
+              indiceAtual={indiceAtual}
+              acertos={acertos}
+              erros={erros}          
+              tempo={tempo}
+              total={totalLetras || texto.length}
             />
 
             <WordProgress texto={texto} indiceAtual={indiceAtual} resultados={resultados} />

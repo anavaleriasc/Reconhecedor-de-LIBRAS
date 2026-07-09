@@ -28,3 +28,7 @@ node_modules/
 # Logs e Artefatos do Agente
 logs/
 .agents/
+
+__pycache__/
+*.pyc
+node_modules/

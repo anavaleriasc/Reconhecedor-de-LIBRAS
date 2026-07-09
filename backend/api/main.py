@@ -11,9 +11,9 @@ Documentação interativa disponível em /docs (Swagger) e /redoc.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import game as game_routes
-from api.routes import prediction as prediction_routes
-from api.services import prediction_service
+from backend.api.routes import game as game_routes
+from backend.api.routes import prediction as prediction_routes
+from backend.api.services import prediction_service
 
 app = FastAPI(
     title="Libras Game API",

@@ -350,18 +350,29 @@ input { font-family: inherit; color: inherit; }
 
 .card-value { font-size: var(--text-2xl); }
 
+/* HUD — agora exibe apenas acertos / erros / tempo, distribuídos em linha,
+ * em largura total. O sessionID foi removido: sem coluna dedicada,
+ * sem divisor extra "empurrado" para o canto (antigo .hud-spacer). */
 .hud {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 120%;
   padding: var(--space-4) var(--space-6);
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  flex-wrap: wrap;
 }
 
-.hud-stat { display: flex; flex-direction: column; gap: 2px; }
+.hud-stat {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
 
 .hud-stat-label,
 .detected-letter-label {
@@ -373,8 +384,9 @@ input { font-family: inherit; color: inherit; }
 
 .hud-stat-value { font-family: var(--font-mono); font-size: var(--text-lg); font-weight: 400; }
 
-.hud-divider { width: 1px; height: 28px; background: var(--border-subtle); }
-.hud-spacer { flex: 1; }
+/* Divisor opcional entre os 3 stats (acertos | erros | tempo).
+ * Use entre itens, não mais como espaçador de sessionID. */
+.hud-divider { width: 1px; height: 28px; background: var(--border-subtle); flex-shrink: 0; }
 
 /* =============================================================================
  * Câmera
@@ -565,14 +577,40 @@ input { font-family: inherit; color: inherit; }
   gap: var(--space-6);
 }
 
+/* game-layout: janela da câmera (esquerda, maior) + dashboard (direita, mais
+ * estreito). O dashboard concentra HUD, progresso da palavra e o card da
+ * letra atual, empilhados verticalmente via .game-dashboard. Proporção
+ * aproximada 62% câmera / 38% dashboard, com limites mínimos pra não
+ * espremer nenhum dos dois em telas médias. */
 .game-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-6);
+  grid-template-columns: minmax(420px, 3fr) minmax(300px, 2fr);
+  gap: var(--space-8);
   align-items: start;
 }
 
-.game-target-card { display: flex; flex-direction: column; gap: var(--space-6); align-items: center; text-align: center;}
+.game-camera-panel {
+  position: sticky;
+  top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.game-camera-panel .camera-frame {
+  min-height: 420px;
+}
+
+.game-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0; /* evita overflow do grid com conteúdo largo */
+  max-width: 420px;
+  margin-left: auto;
+}
+
+.game-target-card { display: flex; flex-direction: column; gap: var(--space-6); align-items: center; text-align: center; width: 120%;}
 
 .game-actions { display: flex; gap: var(--space-3); justify-content: center; flex-wrap: wrap; }
 
@@ -625,13 +663,21 @@ input { font-family: inherit; color: inherit; }
  * Responsivo — breakpoint único consolidado
  * ========================================================================= */
 
+@media (max-width: 960px) {
+  .game-layout { grid-template-columns: 1fr; }
+  .game-camera-panel { position: static; }
+  .game-dashboard { max-width: none; margin-left: 0; }
+  .game-camera-panel .camera-frame { min-height: 0; }
+}
+
 @media (max-width: 720px) {
   .container { padding: 0 var(--space-4); }
-  .game-layout { grid-template-columns: 1fr; }
   .results-stats { grid-template-columns: 1fr 1fr; }
   .site-footer .footer-content,
   .footer-content { flex-direction: column; align-items: center; text-align: center; }
   .footer-section { max-width: 100%; }
+  .hud { flex-wrap: wrap; }
+  .hud-divider { display: none; }
 }
 
 @media (max-width: 420px) {
