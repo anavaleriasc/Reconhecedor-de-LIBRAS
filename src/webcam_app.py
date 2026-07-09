@@ -1,5 +1,5 @@
 """
-realtime_game.py — Modo interativo com webcam para reconhecimento do alfabeto manual da Libras.
+webcam_app.py — Modo interativo com webcam para reconhecimento do alfabeto manual da Libras.
 
 O usuário digita uma palavra ou frase e o sistema solicita que ele reproduza cada
 letra com a mão na frente da webcam. O reconhecimento é feito em tempo real e o

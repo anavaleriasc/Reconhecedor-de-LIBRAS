@@ -75,7 +75,7 @@ libras-alphabet-cv/
     ├── train.py                      # Treinamento do classificador
     ├── evaluate.py                   # Avaliação do modelo
     ├── predict_image.py              # Predição de imagem isolada
-    └── webcam_app.py              # Modo interativo com webcam (jogo e análise)
+    └── webcam_app.py                 # Modo interativo com webcam (jogo e análise)
 ```
 
 > **Nota Importante:** As pastas `models/` e `results/` deste repositório já vêm acompanhadas de um **modelo previamente treinado** (junto com os relatórios e gráficos técnicos gerados durante o seu treinamento) e também contêm **resultados e evidências de experimentos** reais feitos através do Modo de Análise. Dessa forma, você pode iniciar testes com a câmera imediatamente, sem a necessidade de baixar o dataset para treinar o classificador do zero.
