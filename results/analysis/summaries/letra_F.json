@@ -1,0 +1,35 @@
+{
+    "session_name": "letra_F",
+    "condition": "unspecified",
+    "notes": "",
+    "duration_seconds": 10.09,
+    "session_duration_target": 10.0,
+    "completed_full_duration": true,
+    "total_frames": 90,
+    "valid_frames": 90,
+    "hand_detection_rate": 1.0,
+    "most_frequent_top1": "F",
+    "top3_frequent_classes": [
+        [
+            "F",
+            82
+        ],
+        [
+            "T",
+            8
+        ]
+    ],
+    "average_top1_confidence": 0.5096,
+    "average_margin": 0.1433,
+    "class_switches": 10,
+    "temporal_stability": 0.9111,
+    "auto_captures_target": 5,
+    "auto_capture_times_seconds": [
+        2.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0
+    ],
+    "auto_captures_saved": 4
+}

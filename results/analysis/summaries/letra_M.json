@@ -1,0 +1,35 @@
+{
+    "session_name": "letra_M",
+    "condition": "unspecified",
+    "notes": "",
+    "duration_seconds": 10.11,
+    "session_duration_target": 10.0,
+    "completed_full_duration": true,
+    "total_frames": 90,
+    "valid_frames": 90,
+    "hand_detection_rate": 1.0,
+    "most_frequent_top1": "M",
+    "top3_frequent_classes": [
+        [
+            "M",
+            89
+        ],
+        [
+            "Q",
+            1
+        ]
+    ],
+    "average_top1_confidence": 0.2271,
+    "average_margin": 0.0967,
+    "class_switches": 2,
+    "temporal_stability": 0.9889,
+    "auto_captures_target": 5,
+    "auto_capture_times_seconds": [
+        2.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0
+    ],
+    "auto_captures_saved": 4
+}

@@ -1,5 +1,5 @@
 """
-realtime_game.py — Modo interativo com webcam para reconhecimento do alfabeto manual da Libras.
+webcam_app.py — Modo interativo com webcam para reconhecimento do alfabeto manual da Libras.
 
 O usuário digita uma palavra ou frase e o sistema solicita que ele reproduza cada
 letra com a mão na frente da webcam. O reconhecimento é feito em tempo real e o
@@ -18,6 +18,10 @@ Uso:
 import argparse
 import os
 import sys
+import warnings
+
+# Suprimir os alertas chatos de depreciação do Protobuf causados pelo MediaPipe
+warnings.filterwarnings("ignore", category=UserWarning, module="google.protobuf.symbol_database")
 import time
 import cv2
 import numpy as np
@@ -30,6 +34,9 @@ from src.utils import normalizar_texto, desenhar_texto
 # =============================================================================
 # Constantes internas do módulo
 # =============================================================================
+# Altere para "game" se desejar jogar, ou "analysis" para inspecionar predições
+DEFAULT_MODE = "analysis"
+
 _STATUS_AGUARDANDO = "AGUARDANDO"
 _STATUS_CORRETO = "CORRETO"
 _STATUS_INCORRETO = "INCORRETO"
@@ -70,6 +77,13 @@ def criar_parser() -> argparse.ArgumentParser:
         type=int,
         default=config.WEBCAM_INDEX,
         help=f"Índice da câmera a utilizar (padrão: {config.WEBCAM_INDEX}).",
+    )
+    parser.add_argument(
+        "--mode",
+        type=str,
+        choices=["analysis", "game"],
+        default=DEFAULT_MODE,
+        help="Modo de operação: 'analysis' para depurar probabilidades ou 'game' para jogar.",
     )
     return parser
 
@@ -491,6 +505,9 @@ def loop_principal(
     )
 
 
+# (O loop_analise foi movido para src/analysis_mode.py para melhor organização)
+
+
 def main():
     """Ponto de entrada principal do modo interativo com webcam."""
     parser = criar_parser()
@@ -498,7 +515,7 @@ def main():
 
     print("=" * 50)
     print("  RECONHECIMENTO DO ALFABETO MANUAL DA LIBRAS")
-    print("          Modo Interativo com Webcam")
+    print(f"          Modo: {args.mode.upper()}")
     print("=" * 50)
 
     # Carregar modelo e codificador
@@ -507,18 +524,55 @@ def main():
     modelo, label_encoder = carregar_modelo(args.model, args.label_encoder)
     print("Modelo e codificador carregados com sucesso!\n")
 
-    # Solicitar texto ao usuário
-    texto_normalizado = solicitar_texto_usuario()
-    print(f"\nTexto normalizado: {texto_normalizado}")
-    print(f"Letras a soletrar: {' '.join(list(texto_normalizado))}")
+    if args.mode == "game":
+        # Solicitar texto ao usuário
+        texto_normalizado = solicitar_texto_usuario()
+        print(f"\nTexto normalizado: {texto_normalizado}")
+        print(f"Letras a soletrar: {' '.join(list(texto_normalizado))}")
 
-    # Executar loop principal
-    loop_principal(
-        modelo=modelo,
-        label_encoder=label_encoder,
-        camera_index=args.camera,
-        texto_normalizado=texto_normalizado,
-    )
+        # Executar loop principal
+        loop_principal(
+            modelo=modelo,
+            label_encoder=label_encoder,
+            camera_index=args.camera,
+            texto_normalizado=texto_normalizado,
+        )
+    else:
+        # Executar modo de análise avançado
+        try:
+            from src.analysis_mode import run_analysis_mode
+            from datetime import datetime
+        except ImportError as e:
+            print(f"Erro ao carregar o módulo de análise: {e}")
+            sys.exit(1)
+            
+        print("\n" + "-"*50)
+        print("  METADADOS DA SESSÃO DE ANÁLISE")
+        print("-" * 50)
+        
+        default_name = f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        session_name = input(f"Nome da sessão (padrão: {default_name}): ").strip()
+        if not session_name:
+            session_name = default_name
+            
+        condition = input("Condição (ex: boa_iluminacao) (padrão: unspecified): ").strip()
+        if not condition:
+            condition = "unspecified"
+            
+        notes = input("Notas: ").strip()
+        
+        metadata = {
+            "session_name": session_name,
+            "condition": condition,
+            "notes": notes
+        }
+            
+        run_analysis_mode(
+            modelo=modelo,
+            label_encoder=label_encoder,
+            camera_index=args.camera,
+            metadata=metadata
+        )
 
 
 if __name__ == "__main__":

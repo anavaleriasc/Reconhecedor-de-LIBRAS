@@ -1,4 +1,4 @@
-# 🤟 Sistema Interativo de Reconhecimento do Alfabeto Manual da Libras
+# Sistema Interativo de Reconhecimento do Alfabeto Manual da Libras
 
 ## Descrição
 
@@ -75,8 +75,10 @@ libras-alphabet-cv/
     ├── train.py                      # Treinamento do classificador
     ├── evaluate.py                   # Avaliação do modelo
     ├── predict_image.py              # Predição de imagem isolada
-    └── realtime_game.py              # Modo interativo com webcam (jogo)
+    └── webcam_app.py                 # Modo interativo com webcam (jogo e análise)
 ```
+
+> **Nota Importante:** As pastas `models/` e `results/` deste repositório já vêm acompanhadas de um **modelo previamente treinado** (junto com os relatórios e gráficos técnicos gerados durante o seu treinamento) e também contêm **resultados e evidências de experimentos** reais feitos através do Modo de Análise. Dessa forma, você pode iniciar testes com a câmera imediatamente, sem a necessidade de baixar o dataset para treinar o classificador do zero.
 
 ## Dependências
 
@@ -202,7 +204,7 @@ solicita que reproduza cada letra com a mão na frente da webcam:
 
 ```bash
 .venv\Scripts\Activate.ps1
-python -m src.realtime_game --model models/classifier.joblib
+python -m src.webcam_app --model models/classifier.joblib
 ```
 
 ### Como funciona
@@ -230,9 +232,66 @@ python -m src.realtime_game --model models/classifier.joblib
 |-------------------|-------------------------------------------------|---------------------------------------|
 | `--model`         | Caminho para o modelo treinado                  | `models/classifier.joblib`            |
 | `--label-encoder` | Caminho para o codificador de rótulos           | `models/label_encoder.joblib`         |
+| `--mode`          | Define o funcionamento principal do app         | `analysis`                            |
 | `--camera`        | Índice da câmera a utilizar                     | `0`                                   |
 
-### Exemplo de resultado final
+## Modo Análise (Diagnóstico e Logs)
+
+O sistema conta com um **Modo Análise Avançado** construído especificamente para depuração científica do classificador (foco em coletar métricas e diagnosticar problemas). Ele é executado por padrão ao chamar:
+
+```bash
+python -m src.webcam_app
+```
+*(Para acessar o Modo Jogo, utilize `--mode game`)*
+
+O Modo Análise não solicita texto. Ele abre um HUD (Heads-Up Display) de depuração exibindo:
+- Predição Suavizada (Votação temporal dos últimos 15 frames para evitar oscilações).
+- Top 3 Probabilidades matemáticas do classificador em tempo real.
+- Margem de Incerteza (Top1 - Top2).
+
+### Ferramentas de Diagnóstico
+
+Você pode utilizar os seguintes controles no teclado para gerar dados reais de teste:
+
+| Tecla   | Ação                                      |
+|---------|-------------------------------------------|
+| `S`     | **Iniciar/Parar Gravação da Sessão**. Gera um arquivo `.csv` frame a frame e um `.json` de resumo matemático na pasta `results/analysis/`. |
+| `F`     | **Salvar Frame Problemático**. Captura a imagem exata do erro e um `.json` contendo as predições daquele momento. |
+| `Q`     | Sair da análise                           |
+
+### Exemplo de Resumo de Sessão (JSON)
+```json
+{
+    "duration_seconds": 12.45,
+    "valid_frames": 280,
+    "most_frequent_top1": "U",
+    "average_top1_confidence": 0.8923,
+    "class_switches": 12,
+    "temporal_stability": 0.75
+}
+```
+
+### Comandos de Relatório e Gráficos
+
+Para facilitar a documentação científica do seu TCC, criamos 4 scripts que processam os dados gerados pelo Modo Análise:
+
+1. **Gráficos da Sessão (Linhas e Barras)**
+   Gera imagens (`.png`) da linha do tempo e distribuição das classes para cada arquivo CSV gravado.
+   ```bash
+   python -m src.plot_logs
+   ```
+2. **Consolidação de Sessões**
+   Varre todos os JSONs de resumo e agrupa as métricas (duração, trocas de classe, etc.) numa tabela única (`session_summary.csv`).
+   ```bash
+   python -m src.aggregate_sessions
+   ```
+3. **Calcanhar de Aquiles (Piores Classes)**
+   Lê o arquivo `classification_report.csv` (gerado após avaliar o modelo) e desenha um gráfico ranqueando as 10 letras com menor F1-Score.
+   ```bash
+   python -m src.plot_worst_classes
+   ```
+
+### Exemplo de resultado final (Modo Jogo)
 
 ```
 ========================================
