@@ -1,4 +1,4 @@
-# Sistema Interativo de Reconhecimento do Alfabeto Datilológico do Libras
+# Sistema Interativo de Reconhecimento do Alfabeto Datilológico da Libras
 
 ## Equipe
 
